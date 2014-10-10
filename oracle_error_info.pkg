@@ -1,0 +1,111 @@
+CREATE OR REPLACE PACKAGE oracle_error_info
+IS
+   FUNCTION is_app_error (code_in IN INTEGER)
+      RETURN BOOLEAN;
+
+   FUNCTION is_valid_oracle_error (
+      code_in            IN   INTEGER
+    , app_errors_ok_in   IN   BOOLEAN DEFAULT TRUE
+    , user_error_ok_in   IN   BOOLEAN DEFAULT TRUE
+   )
+      RETURN BOOLEAN;
+
+   PROCEDURE validate_oracle_error (
+      code_in            IN       INTEGER
+    , message_out        OUT      VARCHAR2
+    , is_valid_out       OUT      BOOLEAN
+    , app_errors_ok_in   IN       BOOLEAN DEFAULT TRUE
+    , user_error_ok_in   IN       BOOLEAN DEFAULT TRUE
+   );
+END oracle_error_info;
+/
+
+CREATE OR REPLACE PACKAGE BODY oracle_error_info
+IS
+   FUNCTION is_app_error (code_in IN INTEGER)
+      RETURN BOOLEAN
+   IS
+   BEGIN
+      RETURN code_in BETWEEN -20999 AND -20000;
+   END is_app_error;
+
+   PROCEDURE validate_oracle_error (
+      code_in            IN       INTEGER
+    , message_out        OUT      VARCHAR2
+    , is_valid_out       OUT      BOOLEAN
+    , app_errors_ok_in   IN       BOOLEAN DEFAULT TRUE
+    , user_error_ok_in   IN       BOOLEAN DEFAULT TRUE
+   )
+   IS
+      l_message   VARCHAR2 (32767);
+
+      PROCEDURE set_failure
+      IS
+      BEGIN
+         message_out := NULL;
+         is_valid_out := FALSE;
+      END set_failure;
+   BEGIN
+      l_message := SQLERRM (code_in);
+
+       -- If SQLERRM does not find an entry, it return a string like one of these:
+      -- If the number is negative...
+       -- ORA-NNNNN: Message NNNN not found;  product=RDBMS; facility=ORA
+      -- If the number is positive...
+      --  -13000: non-ORACLE exception
+      -- If the positive number is too big, we get numeric overflow.
+      IF is_app_error (code_in) AND NOT app_errors_ok_in
+      THEN
+         set_failure;
+      ELSIF code_in = 1 AND NOT user_error_ok_in
+      THEN
+         set_failure;
+      ELSIF    l_message LIKE 'ORA-_____: Message%not found;%'
+            OR l_message LIKE '%: non-ORACLE exception%'
+      THEN
+         set_failure;
+      ELSE
+         message_out := l_message;
+         is_valid_out := TRUE;
+      END IF;
+   EXCEPTION
+      WHEN OTHERS
+      THEN
+         --numeric overflow
+         IF SQLCODE = -1426
+         THEN
+            set_failure;
+         ELSE
+            RAISE;
+         END IF;
+   END validate_oracle_error;
+
+   FUNCTION is_valid_oracle_error (
+      code_in            IN   INTEGER
+    , app_errors_ok_in   IN   BOOLEAN DEFAULT TRUE
+    , user_error_ok_in   IN   BOOLEAN DEFAULT TRUE
+   )
+      RETURN BOOLEAN
+   IS
+      l_message   VARCHAR2 (32767);
+      retval      BOOLEAN;
+   BEGIN
+      validate_oracle_error (code_in
+                           , l_message
+                           , retval
+                           , app_errors_ok_in
+                           , user_error_ok_in
+                            );
+      RETURN retval;
+   END is_valid_oracle_error;
+END oracle_error_info;
+/
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

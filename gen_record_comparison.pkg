@@ -1,0 +1,204 @@
+CREATE OR REPLACE PACKAGE gen_record_comparison
+IS
+    -- Author  : SPENCER
+    -- Created : 12/27/01 8:38:20 AM
+    -- Purpose : create functions to test records for equality
+   -- Public function and procedure declarations
+   PROCEDURE make_package_compare (name_in IN VARCHAR2 := '%');
+
+   
+-- this function will require CREATE PROCEDURE priviledge
+   PROCEDURE make_function_compare (
+      name_in   all_objects.object_name%TYPE
+   );
+END gen_record_comparison;
+/
+CREATE OR REPLACE PACKAGE BODY gen_record_comparison
+IS
+   bdy_lines   DBMS_SQL.varchar2s;
+
+   -- Private function and procedure implementations
+
+-- generate the FUNCTION definition header string
+--   common to package body and header and standalone function  
+   FUNCTION gen_func_call (
+      name_in        all_objects.object_name%TYPE,
+      func_name_in   all_objects.object_name%TYPE
+   )
+      RETURN VARCHAR2
+   IS
+      v_str   VARCHAR2 (255);
+   BEGIN
+      RETURN    'FUNCTION '
+             || func_name_in
+             || '( A '
+             || name_in
+             || '%ROWTYPE , '
+             || ' B '
+             || name_in
+             || '%ROWTYPE ) '
+             || 'RETURN BOOLEAN ';
+   END gen_func_call;
+
+   
+-- generate the FUNCTION definition body lines
+--   common to package body and standalone function  
+   PROCEDURE gen_func_body (
+      name_in       all_objects.object_name%TYPE,
+      rec_name_in   all_objects.object_name%TYPE
+   )
+   IS
+      v_rec_name   all_objects.object_name%TYPE
+                    := NVL (rec_name_in, name_in);
+      v_line       PLS_INTEGER;
+   BEGIN
+      bdy_lines (  bdy_lines.LAST
+                 + 1) := ' IS BEGIN RETURN (';
+
+      FOR k IN  (SELECT   *
+                     FROM user_tab_columns
+                    WHERE table_name =
+                                  UPPER (name_in)
+                 ORDER BY column_id)
+      LOOP
+         v_line :=   bdy_lines.LAST
+                   + 1;
+
+         IF k.column_id > 1
+         THEN
+            bdy_lines (  v_line
+                       - 1) :=
+                  bdy_lines (  v_line
+                             - 1)
+               || ' AND ';
+         END IF;
+
+         bdy_lines (v_line) :=    '(( A.'
+                               || k.column_name
+                               || ' IS NULL AND B.'
+                               || k.column_name
+                               || ' IS NULL ) OR ';
+
+         IF k.data_type LIKE '%LOB'
+         THEN
+            bdy_lines (  v_line
+                       + 1) :=
+                  'DBMS_LOB.COMPARE( A.'
+               || k.column_name
+               || ', B.'
+               || k.column_name
+               || ' ) = 0 )';
+         ELSE
+            bdy_lines (  v_line
+                       + 1) :=    ' A.'
+                               || k.column_name
+                               || '= B.'
+                               || k.column_name
+                               || '  )';
+         END IF;
+      END LOOP;
+
+      bdy_lines (  bdy_lines.LAST
+                 + 1) := ') ;';
+      bdy_lines (  bdy_lines.LAST
+                 + 1) :=
+                          'END '
+                       || v_rec_name
+                       || ';';
+   END gen_func_body;
+
+   
+-- compile the generated PL/SQL  
+   PROCEDURE COMPILE (lines DBMS_SQL.varchar2s)
+   IS
+      v_cur   PLS_INTEGER := DBMS_SQL.open_cursor;
+   BEGIN
+      DBMS_SQL.parse (
+         v_cur,
+         lines,
+         lines.FIRST,
+         lines.LAST,
+         TRUE,
+         DBMS_SQL.native
+      );
+      DBMS_SQL.close_cursor (v_cur);
+   END COMPILE;
+
+   
+  -- Public function and procedure implementations
+-- creates a package of overloaded COMPARE_RECORD.EQ functions
+--   for each table and view in the current schema  
+   PROCEDURE make_package_compare (name_in IN VARCHAR2 := '%')
+   IS
+      hdr_lines   DBMS_SQL.varchar2s;
+      func_line   VARCHAR2 (255);
+   BEGIN
+      hdr_lines.DELETE;
+      bdy_lines.DELETE;
+      hdr_lines (1) :=
+         'CREATE OR REPLACE PACKAGE COMPARE_RECORD IS ';
+      bdy_lines (1) :=
+         'CREATE OR REPLACE PACKAGE BODY COMPARE_RECORD IS ';
+
+      FOR j IN  (SELECT object_name
+                   FROM user_objects
+                  WHERE object_name like UPPER (name_in)
+                    AND object_type IN
+                                ('VIEW', 'TABLE'))
+      LOOP
+         func_line :=
+               gen_func_call (j.object_name, 'EQ');
+         hdr_lines (  hdr_lines.LAST
+                    + 1) :=    func_line
+                            || ';';
+         bdy_lines (  bdy_lines.LAST
+                    + 1) := func_line;
+         gen_func_body (j.object_name, 'EQ');
+      END LOOP;
+
+      hdr_lines (  hdr_lines.LAST
+                 + 1) := 'END COMPARE_RECORD;';
+      bdy_lines (  bdy_lines.LAST
+                 + 1) := 'END COMPARE_RECORD;';
+      COMPILE (hdr_lines);
+      COMPILE (bdy_lines);
+   END make_package_compare;
+
+   
+--Creates a standalone function in the current schema for one 
+--   table or view 
+   PROCEDURE make_function_compare (
+      name_in   all_objects.object_name%TYPE
+   )
+   IS
+      v_name   VARCHAR2 (30)
+              :=    'EQ_'
+                 || SUBSTR (name_in, 1, 27);
+   BEGIN
+      bdy_lines.DELETE;
+      bdy_lines (1) :=    'CREATE OR REPLACE '
+                       || gen_func_call (
+                             name_in,
+                             v_name
+                          );
+      gen_func_body (name_in, v_name);
+
+      FOR k IN 1 .. bdy_lines.LAST
+      LOOP
+         DBMS_OUTPUT.put_line (bdy_lines (k));
+      END LOOP;
+
+      COMPILE (bdy_lines);
+   END make_function_compare;
+END gen_record_comparison;
+/
+
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

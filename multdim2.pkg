@@ -1,0 +1,228 @@
+REM Provided by John Beresniewicz
+
+CREATE OR REPLACE PACKAGE multdim
+IS
+   TYPE dim1_t IS TABLE OF VARCHAR2 (32767)
+      INDEX BY BINARY_INTEGER;
+
+   TYPE dim2_t IS TABLE OF dim1_t
+      INDEX BY BINARY_INTEGER;
+
+   TYPE dim3_t IS TABLE OF dim2_t
+      INDEX BY BINARY_INTEGER;
+
+   PROCEDURE setcell (
+      array_in   IN OUT   dim3_t
+    , dim1_in             PLS_INTEGER
+    , dim2_in             PLS_INTEGER
+    , dim3_in             PLS_INTEGER
+    , value_in   IN       VARCHAR2
+   );
+
+   FUNCTION getcell (
+      array_in   IN   dim3_t
+    , dim1_in         PLS_INTEGER
+    , dim2_in         PLS_INTEGER
+    , dim3_in         PLS_INTEGER
+   )
+      RETURN VARCHAR2;
+
+   FUNCTION EXISTS (
+      array_in   IN   dim3_t
+    , dim1_in         PLS_INTEGER
+    , dim2_in         PLS_INTEGER
+    , dim3_in         PLS_INTEGER
+   )
+      RETURN BOOLEAN;
+
+   FUNCTION dim1plane (
+      array_in     IN   dim3_t
+    , dim1val_in        PLS_INTEGER                    -- fixed value of dim1
+   )
+      RETURN dim2_t;
+
+   FUNCTION dim2plane (
+      array_in     IN   dim3_t
+    , dim2val_in        PLS_INTEGER                    -- fixed value of dim2
+   )
+      RETURN dim2_t;
+
+   FUNCTION dim3plane (
+      array_in     IN   dim3_t
+    , dim3val_in        PLS_INTEGER                    -- fixed value of dim3
+   )
+      RETURN dim2_t;
+
+   PROCEDURE DUMP (dim3_tbl IN dim3_t);
+
+   PROCEDURE DUMP (dim2_tbl IN dim2_t);
+
+   PROCEDURE DUMP (dim1_tbl IN dim1_t);
+END multdim;
+/
+
+CREATE OR REPLACE PACKAGE BODY multdim
+IS
+   PROCEDURE setcell (
+      array_in   IN OUT   dim3_t
+    , dim1_in             PLS_INTEGER
+    , dim2_in             PLS_INTEGER
+    , dim3_in             PLS_INTEGER
+    , value_in   IN       VARCHAR2
+   )
+   IS
+   BEGIN
+      array_in (dim3_in) (dim2_in) (dim1_in) := value_in;
+   END;
+
+   FUNCTION getcell (
+      array_in   IN   dim3_t
+    , dim1_in         PLS_INTEGER
+    , dim2_in         PLS_INTEGER
+    , dim3_in         PLS_INTEGER
+   )
+      RETURN VARCHAR2
+   IS
+   BEGIN
+      RETURN array_in (dim3_in) (dim2_in) (dim1_in);
+   END;
+
+   FUNCTION EXISTS (
+      array_in   IN   dim3_t
+    , dim1_in         PLS_INTEGER
+    , dim2_in         PLS_INTEGER
+    , dim3_in         PLS_INTEGER
+   )
+      RETURN BOOLEAN
+   IS
+      l_value   VARCHAR2 (32767);
+   BEGIN
+      l_value := array_in (dim3_in) (dim2_in) (dim1_in);
+      RETURN TRUE;
+   EXCEPTION
+      WHEN NO_DATA_FOUND
+      THEN
+         RETURN FALSE;
+   END;
+
+   /*
+   ** new stuff to experiment with cubes - JB
+   */
+   FUNCTION dim1plane (
+      array_in     IN   dim3_t
+    , dim1val_in        PLS_INTEGER                     -- fixed value of dim1
+   )
+      RETURN dim2_t
+   IS
+      dim2_tbl   dim2_t;
+      indx1      PLS_INTEGER;
+      indx2      PLS_INTEGER;
+   BEGIN
+      indx1 := array_in.FIRST;
+
+      WHILE indx1 IS NOT NULL
+      LOOP
+         indx2 := array_in (indx1).FIRST;
+
+         WHILE indx2 IS NOT NULL
+         LOOP
+            IF array_in (indx1) (indx2).EXISTS (dim1val_in)
+            THEN
+               dim2_tbl (indx1) (indx2) :=
+                                        array_in (indx1) (indx2) (dim1val_in);
+            END IF;
+
+            indx2 := array_in (indx1).NEXT (indx2);
+         END LOOP;
+
+         indx1 := array_in.NEXT (indx1);
+      END LOOP;
+
+      RETURN dim2_tbl;
+   END dim1plane;
+
+   FUNCTION dim2plane (
+      array_in     IN   dim3_t
+    , dim2val_in        PLS_INTEGER                     -- fixed value of dim2
+   )
+      RETURN dim2_t
+   IS
+      dim2_tbl   dim2_t;
+      indx       PLS_INTEGER;
+   BEGIN
+      indx := array_in.FIRST;
+
+      WHILE indx IS NOT NULL
+      LOOP
+         IF array_in (indx) (dim2val_in).COUNT > 0
+         THEN
+            dim2_tbl (indx) := array_in (indx) (dim2val_in);
+         END IF;
+
+         indx := array_in.NEXT (indx);
+      END LOOP;
+
+      RETURN dim2_tbl;
+   END dim2plane;
+
+   FUNCTION dim3plane (
+      array_in     IN   dim3_t
+    , dim3val_in        PLS_INTEGER                     -- fixed value of dim3
+   )
+      RETURN dim2_t
+   IS
+      dim2_tbl   dim2_t;
+   BEGIN
+      dim2_tbl := array_in (dim3val_in);
+      RETURN dim2_tbl;
+   END dim3plane;
+
+   PROCEDURE DUMP (dim3_tbl IN dim3_t)
+   IS
+      indx   PLS_INTEGER;
+   BEGIN
+      indx := dim3_tbl.FIRST;
+
+      WHILE indx IS NOT NULL
+      LOOP
+         DUMP (dim3_tbl (indx));
+         indx := dim3_tbl.NEXT (indx);
+      END LOOP;
+   END DUMP;
+
+   PROCEDURE DUMP (dim2_tbl IN dim2_t)
+   IS
+      indx   PLS_INTEGER;
+   BEGIN
+      indx := dim2_tbl.FIRST;
+
+      WHILE indx IS NOT NULL
+      LOOP
+         DUMP (dim2_tbl (indx));
+         indx := dim2_tbl.NEXT (indx);
+      END LOOP;
+   END DUMP;
+
+   PROCEDURE DUMP (dim1_tbl IN dim1_t)
+   IS
+      indx   PLS_INTEGER;
+   BEGIN
+      indx := dim1_tbl.FIRST;
+
+      WHILE indx IS NOT NULL
+      LOOP
+         DBMS_OUTPUT.put_line (SUBSTR (dim1_tbl (indx), 1, 255));
+         indx := dim1_tbl.NEXT (indx);
+      END LOOP;
+   END DUMP;
+END multdim;
+/
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

@@ -1,0 +1,316 @@
+CREATE OR REPLACE PACKAGE callstack
+/*
+Author: Darko Egersdorfer, EDW
+Standard Bank of South Africa
+Tel   : ( 011) 636 6405
+Fax  : ( 011) 636 5266
+E-mail : degersdorfer@mail..sbic.co.za
+*/
+IS
+   /* Types */
+   /* Record for stack output
+      lineno - line number where other program is called
+      name - name of the called program
+      type - type of the called program
+         (procedure, function, package or package body */
+   TYPE stack_rec_type IS RECORD (
+      lineno   NUMBER
+    , NAME     VARCHAR2 (100)
+    , TYPE     VARCHAR2 (30)
+   );
+
+   TYPE stack_tab_type IS TABLE OF stack_rec_type
+      INDEX BY BINARY_INTEGER;
+
+   /* Procedure to read the stack. It can be used to display the
+      sequence of program execution */
+   /* It returns the table of the stack_rec_type record
+      with all programs called in sequence of calling.
+      If in SQL+ , SERVEROUTPUT is set ON, this procedure will
+      also prints the stack.
+      Example :
+       Procedure DWE3.TEST1 calls procedure DWE3.TEST2
+      procedure DWE3.TEST2 calls procedure DWE3.TEST3
+      procedure DWE3.TEST3 calls packaged procedure DWE3.TEST_STACK.TEST1
+      procedure DWE3.TEST_STACK.TEST1 calls procedure DWE3.TEST4
+      If we call READ_STACK in DWE3.TEST4 and set serveroutput on,
+      after executing DWE3.TEST1 we will get the following output:
+         SQL>exec dwe3.test1
+         Line:4 name:DWE3.TEST1 type:procedure
+         Line:8 name:DWE3.TEST2 type:procedure
+         Line:7 name:DWE3.TEST3 type:procedure
+         Line:7 name:DWE3.TST_STACK.TEST1 type:package body
+         Line:6 name:DWE3.TEST4 type:procedure
+         Line:82 name:callstack.READ_STACK type:package body
+      It means:
+         Father procedure is DWE3.TEST1. On line 4 of DWE3.TEST1
+         the other procedure DWE3.TEST2 is called. On line 8 of DWE3.TEST2
+         is procedure DWE3.TEST3 called. DWE3.TEST3 calls on line 7
+         the procedure DWE3.TST_STACK.TEST1 from package body.
+         On line 7 in DWE3.TST_STACK package body is procedure DWE3.TEST4 called.
+         DWE3.TEST4 calls callstack.READ_STACK on line 6.
+         callstack.READ_STACK reads stack in 82nd line. This will be always
+         the last output line.
+      Example how to call it:
+         CREATE OR REPLACE procedure DWE3.test4
+         IS
+            stack_tb  callstack.stack_tab_type;
+            my_prog  VARCHAR2(100);
+         BEGIN
+            callstack.READ_STACK(stack_tb);
+            FOR i IN 1 .. stack_tb.COUNT
+            LOOP
+               my_prog := stack_tb(i).name;
+               DBMS_OUTPUT.PUT_LINE(my_prog);
+            END LOOP;
+         END;
+   */
+   PROCEDURE read_stack (stack_tab OUT stack_tab_type, trc IN BOOLEAN := FALSE);
+END;
+/
+
+CREATE OR REPLACE PACKAGE BODY callstack
+IS
+   --
+   /* Procedure to read the stack */
+   PROCEDURE read_stack (stack_tab OUT stack_tab_type, trc IN BOOLEAN
+            := FALSE)
+   IS
+      TYPE srch_rec_type IS RECORD (
+         what    VARCHAR2 (30)
+       , lnght   NUMBER
+       , cnt     NUMBER
+       , INSTR   NUMBER
+      );
+
+      TYPE srch_tab_type IS TABLE OF srch_rec_type
+         INDEX BY BINARY_INTEGER;
+
+      srch_tab        srch_tab_type;
+
+      --
+      TYPE pos_type IS TABLE OF NUMBER
+         INDEX BY BINARY_INTEGER;
+
+      TYPE name_type IS TABLE OF VARCHAR2 (100)
+         INDEX BY BINARY_INTEGER;
+
+      --
+      v_stack         VARCHAR2 (2000);
+      v_stack_part    VARCHAR2 (2000);
+      --
+      all_pos         pos_type;
+      all_pos1        pos_type;
+      all_name        name_type;
+      all_cnt         NUMBER;
+      v_instr         NUMBER;
+      v_bl_pos        NUMBER;
+      v_instrval      NUMBER;
+      v_indx          NUMBER;
+      val1            NUMBER;
+      val2            NUMBER;
+      val3            NUMBER;
+      val4            NUMBER;
+
+      CURSOR min_instr_cur
+      IS
+         SELECT   DECODE (val1, 0, 9999, val1) instrval, 1 indx
+             FROM DUAL
+         UNION ALL
+         SELECT   DECODE (val2, 0, 9999, val2), 2 indx
+             FROM DUAL
+         UNION ALL
+         SELECT   DECODE (val3, 0, 9999, val3), 3 indx
+             FROM DUAL
+         UNION ALL
+         SELECT   DECODE (val4, 0, 9999, val4), 4 indx
+             FROM DUAL
+         ORDER BY 1;
+
+      pnt_pos         NUMBER;
+      v_owner         VARCHAR2 (30);
+      v_name          VARCHAR2 (30);
+      v_text          all_source.text%TYPE;
+      empty_tab       stack_tab_type;
+      stack_rev_tab   stack_tab_type;
+      j               INTEGER;
+   BEGIN
+      stack_tab := empty_tab;
+      stack_rev_tab := empty_tab;
+      srch_tab (1).what := 'function';
+      srch_tab (2).what := 'procedure';
+      srch_tab (3).what := 'package';
+      srch_tab (4).what := 'package body';
+      srch_tab (1).lnght := 8;
+      srch_tab (2).lnght := 9;
+      srch_tab (3).lnght := 7;
+      srch_tab (4).lnght := 12;
+      srch_tab (1).cnt := 0;
+      srch_tab (2).cnt := 0;
+      srch_tab (3).cnt := 0;
+      srch_tab (4).cnt := 0;
+      --
+      v_stack := REPLACE (DBMS_UTILITY.format_call_stack, CHR (10), ' ');
+      v_stack := REPLACE (v_stack, CHR (13), ' ');
+
+      --
+      FOR i IN 1 .. srch_tab.COUNT
+      LOOP
+         srch_tab (i).INSTR :=
+                  INSTR (v_stack, srch_tab (i).what, 1, srch_tab (i).cnt + 1);
+      END LOOP;
+
+      --
+      all_cnt := 0;
+
+      WHILE srch_tab (1).INSTR > 0
+        OR srch_tab (2).INSTR > 0
+        OR srch_tab (3).INSTR > 0
+        OR srch_tab (4).INSTR > 0
+      LOOP
+         all_cnt := all_cnt + 1;
+
+         --
+         IF srch_tab (3).INSTR = srch_tab (4).INSTR
+            AND srch_tab (3).INSTR > 0
+         THEN
+            srch_tab (3).cnt := srch_tab (3).cnt + 1;
+            srch_tab (3).INSTR :=
+                  INSTR (v_stack, srch_tab (3).what, 1, srch_tab (3).cnt + 1);
+         END IF;
+
+         val1 := srch_tab (1).INSTR;
+         val2 := srch_tab (2).INSTR;
+         val3 := srch_tab (3).INSTR;
+         val4 := srch_tab (4).INSTR;
+
+         OPEN min_instr_cur;
+
+         FETCH min_instr_cur
+          INTO v_instrval, v_indx;
+
+         CLOSE min_instr_cur;
+
+         -- stavi njega u tabelu all_pos
+         -- izracunaj novi instring za onaj koji si stavio
+         srch_tab (v_indx).cnt := srch_tab (v_indx).cnt + 1;
+         all_pos1 (all_cnt) := v_instrval;
+         all_pos (all_cnt) := v_instrval + srch_tab (v_indx).lnght;
+         stack_rev_tab (all_cnt).TYPE := srch_tab (v_indx).what;
+         srch_tab (v_indx).INSTR :=
+            INSTR (v_stack
+                 , srch_tab (v_indx).what
+                 , 1
+                 , srch_tab (v_indx).cnt + 1
+                  );
+      END LOOP;
+
+      --
+      FOR i IN 1 .. all_cnt
+      LOOP
+         v_stack_part := LTRIM (SUBSTR (v_stack, all_pos (i)));
+         v_bl_pos := INSTR (v_stack_part, ' ');
+
+         IF v_bl_pos = 0
+         THEN
+            stack_rev_tab (i).NAME := SUBSTR (v_stack_part, 1);
+         ELSE
+            stack_rev_tab (i).NAME := SUBSTR (v_stack_part, 1, v_bl_pos - 1);
+         END IF;
+
+         --
+         v_stack_part := RTRIM (SUBSTR (v_stack, 1, all_pos1 (i) - 1));
+         v_bl_pos := INSTR (v_stack_part, ' ', -1);
+         stack_rev_tab (i).lineno :=
+                               TO_NUMBER (SUBSTR (v_stack_part, v_bl_pos + 1));
+      END LOOP;
+
+      --
+      FOR i IN 1 .. all_cnt
+      LOOP
+         IF     stack_rev_tab (i).TYPE IN
+                                      (srch_tab (3).what, srch_tab (4).what)
+            AND i < all_cnt
+         THEN
+            pnt_pos := INSTR (stack_rev_tab (i + 1).NAME, '.');
+
+            IF pnt_pos > 0
+            THEN
+               v_owner := SUBSTR (stack_rev_tab (i + 1).NAME, 1, pnt_pos - 1);
+               v_name := SUBSTR (stack_rev_tab (i + 1).NAME, pnt_pos + 1);
+
+               SELECT UPPER (text)
+                 INTO v_text
+                 FROM all_source
+                WHERE NAME = v_name
+                  AND owner = v_owner
+                  AND TYPE = UPPER (stack_rev_tab (i + 1).TYPE)
+                  AND line = stack_rev_tab (i + 1).lineno;
+
+               v_name :=
+                  SUBSTR (stack_rev_tab (i).NAME
+                        , INSTR (stack_rev_tab (i).NAME, '.') + 1
+                         );
+               pnt_pos := INSTR (SUBSTR (v_text, INSTR (v_text, v_name)), '.');
+
+               IF pnt_pos > 0
+               THEN
+                  v_text := SUBSTR (v_text, INSTR (v_text, v_name) + pnt_pos);
+                  val1 := INSTR (v_text, ' ');
+                  val2 := INSTR (v_text, ':');
+                  val3 := INSTR (v_text, '(');
+                  val4 := INSTR (v_text, ';');
+
+                  OPEN min_instr_cur;
+
+                  FETCH min_instr_cur
+                   INTO v_instrval, v_indx;
+
+                  CLOSE min_instr_cur;
+
+                  --
+                  IF v_instrval < 9999
+                  THEN
+                     stack_rev_tab (i).NAME :=
+                           stack_rev_tab (i).NAME
+                        || '.'
+                        || SUBSTR (v_text, 1, v_instrval - 1);
+                  END IF;
+               END IF;
+            END IF;
+         END IF;
+      END LOOP;
+
+      --
+      j := 0;
+
+      FOR i IN REVERSE 1 .. all_cnt
+      LOOP
+         j := j + 1;
+         stack_tab (j).lineno := stack_rev_tab (i).lineno;
+         stack_tab (j).NAME := stack_rev_tab (i).NAME;
+         stack_tab (j).TYPE := stack_rev_tab (i).TYPE;
+
+         IF trc
+         THEN
+            DBMS_OUTPUT.put_line (   'Line:'
+                                  || TO_CHAR (stack_tab (j).lineno)
+                                  || ' name:'
+                                  || stack_tab (j).NAME
+                                  || ' type:'
+                                  || stack_tab (j).TYPE
+                                 );
+         END IF;
+      END LOOP;
+   END;
+END;
+/
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

@@ -1,0 +1,291 @@
+CREATE OR REPLACE PACKAGE str2list
+-- Copyright 2000 Steven Feuerstein 
+--                steven@stevenfeuerstein.com
+IS
+   PROCEDURE parse (
+      str             IN   VARCHAR2,
+      delim           IN   VARCHAR2,
+      pkg             IN   VARCHAR2,
+      coll            IN   VARCHAR2,
+      datatype        IN   VARCHAR2 := 'VARCHAR2(32767)',
+      extend_needed        BOOLEAN := FALSE
+   );
+
+   PROCEDURE parse (
+      str          IN   VARCHAR2,
+      delim        IN   VARCHAR2,
+      pkg          IN   VARCHAR2,
+      appendproc   IN   VARCHAR2,
+                             /* pkg.appendproc (oneval); */
+      deleteproc   IN   VARCHAR2,
+          /* pkg.deleteproc (onerow); or pkg.deleteproc; */
+      datatype     IN   VARCHAR2
+   );
+
+   PROCEDURE showlist (pkg IN VARCHAR2, coll IN VARCHAR2);
+
+   PROCEDURE showlist (
+      pkg            IN   VARCHAR2,
+      firstrowproc   IN   VARCHAR2,
+      nextrowproc    IN   VARCHAR2,
+      getvalfunc     IN   VARCHAR2,
+      showproc       IN   VARCHAR2 := 'pl',
+      datatype       IN   VARCHAR2 := 'VARCHAR2(32767)'
+   );
+   
+   PROCEDURE trc;
+   PROCEDURE notrc;
+   FUNCTION tracing RETURN BOOLEAN;
+END str2list;
+/ 
+CREATE OR REPLACE PACKAGE BODY str2list
+IS
+   g_trc BOOLEAN := FALSE;
+
+   PROCEDURE trc
+   IS
+   BEGIN
+      g_trc := TRUE;
+   END;
+
+   PROCEDURE notrc
+   IS
+   BEGIN
+      g_trc := FALSE;
+   END;
+
+   FUNCTION tracing RETURN BOOLEAN
+   IS
+   BEGIN
+      RETURN g_trc;
+   END;
+   
+   PROCEDURE disperr (str IN VARCHAR2)
+   IS
+   BEGIN
+      do.pl /* do.pkg */ ('Compilation/Execution Error:');
+      do.pl /* do.pkg */ (SQLERRM);
+      do.pl /* do.pkg */ ('In:');
+      do.pl /* do.pkg */ (str);
+   END;
+
+   PROCEDURE parse (
+      str             IN   VARCHAR2,
+      delim           IN   VARCHAR2,
+      pkg             IN   VARCHAR2,
+      coll            IN   VARCHAR2,
+      datatype        IN   VARCHAR2 := 'VARCHAR2(32767)',
+      extend_needed        BOOLEAN := FALSE
+   )
+   IS
+      collname        VARCHAR2 (100)   := pkg || '.' || coll;
+      dynblock        VARCHAR2 (32767);
+      extstring       VARCHAR2 (100);
+      nextrowstring   VARCHAR2 (100);
+   BEGIN
+      IF extend_needed
+      THEN
+         -- Nested table or VARRAY
+         extstring := collname || '.EXTEND;';
+         nextrowstring := collname || '.LAST';
+      ELSE
+         -- Index-by collection
+         extstring := NULL;
+         nextrowstring :=
+                       'NVL (' || collname || '.LAST, 0) + 1';
+      END IF;
+
+      dynblock :=
+         'DECLARE 
+            v_loc PLS_INTEGER;
+            v_startloc PLS_INTEGER := 1;
+            v_item ' ||
+            datatype ||
+            ';
+          BEGIN ' ||
+            collname ||
+            '.DELETE;
+             IF :str IS NOT NULL 
+             THEN 
+                LOOP
+                   v_loc := INSTR (:str, :delim, v_startloc);
+                   IF v_loc = v_startloc
+                   THEN
+                      v_item := NULL;
+                   ELSIF v_loc = 0
+                   THEN
+                      v_item := SUBSTR (:str, v_startloc);
+                   ELSE
+                      v_item := SUBSTR (:str, v_startloc, v_loc - v_startloc);
+                   END IF;' ||
+                   extstring || collname || '(' || nextrowstring || ') 
+                      := v_item;
+                      
+                   IF v_loc = 0
+                   THEN
+                      EXIT;
+                   ELSE 
+                      v_startloc := v_loc + 1;
+                   END IF;
+                END LOOP;
+             END IF;
+          END;';
+      
+	  IF tracing THEN do.pl /* do.pkg */ ('STR2LIST: DIRECT ASSIGNMENT:'); do.pl /* do.pkg */ (dynblock); END IF;
+	  EXECUTE IMMEDIATE dynblock USING str, delim;
+   EXCEPTION
+      WHEN OTHERS
+      THEN
+         disperr (dynblock); raise; -- TVP 5/2001
+   END;
+
+   PROCEDURE parse (
+      str          IN   VARCHAR2,
+      delim        IN   VARCHAR2,
+      pkg          IN   VARCHAR2,
+      appendproc   IN   VARCHAR2,
+      deleteproc   IN   VARCHAR2,
+      datatype     IN   VARCHAR2
+   )
+   IS
+      dynblock   VARCHAR2 (32767);
+   BEGIN
+      dynblock :=
+         'DECLARE 
+            v_loc PLS_INTEGER;
+            v_startloc PLS_INTEGER := 1;
+            v_item ' ||
+            datatype ||
+            ';
+          BEGIN 
+             ' ||
+            pkg ||
+            '.' ||
+            deleteproc ||
+            ';
+             IF :str IS NOT NULL 
+             THEN 
+                LOOP
+                   v_loc := INSTR (:str, :delim, v_startloc);
+                   IF v_loc = v_startloc
+                   THEN
+                      v_item := NULL;
+                   ELSIF v_loc = 0
+                   THEN
+                      v_item := SUBSTR (:str, v_startloc);
+                   ELSE
+                      v_item := SUBSTR (:str, v_startloc, v_loc - v_startloc);
+                   END IF;' ||
+            pkg ||
+            '.' ||
+            appendproc ||
+            '( v_item);
+                   IF v_loc = 0
+                   THEN
+                      EXIT;
+                   ELSE 
+                      v_startloc := v_loc + 1;
+                   END IF;
+                END LOOP;
+             END IF;
+          END;';
+      
+	  IF tracing THEN do.pl /* do.pkg */ ('STR2LIST: API ASSIGNMENT:'); do.pl /* do.pkg */ (dynblock); END IF;
+	  EXECUTE IMMEDIATE dynblock USING str, delim;
+   EXCEPTION
+      WHEN OTHERS
+      THEN
+         disperr (dynblock); raise;
+   END;
+
+   PROCEDURE showlist (pkg IN VARCHAR2, coll IN VARCHAR2)
+   IS
+      collname   VARCHAR2 (100)   := pkg || '.' || coll;
+      dynblock   VARCHAR2 (32767);
+   BEGIN
+      dynblock :=
+         'DECLARE 
+            indx PLS_INTEGER := ' ||
+            collname ||
+            '.FIRST;
+            v_startloc PLS_INTEGER := 1;
+            v_item VARCHAR2(32767);
+          BEGIN 
+             LOOP
+                EXIT WHEN indx IS NULL;
+                do.pl /* do.pkg */ (' ||
+            collname ||
+            '(indx));
+                indx := ' ||
+            collname ||
+            '.NEXT (indx);
+             END LOOP;
+          END;';
+      
+	  IF tracing THEN do.pl /* do.pkg */ ('STR2LIST: SHOW LIST - DIRECT:'); do.pl /* do.pkg */ (dynblock); END IF;
+      EXECUTE IMMEDIATE dynblock;
+   EXCEPTION
+      WHEN OTHERS
+      THEN
+         disperr (dynblock);
+   END;
+
+   PROCEDURE showlist (
+      pkg            IN   VARCHAR2,
+      firstrowproc   IN   VARCHAR2,
+      nextrowproc    IN   VARCHAR2,
+      getvalfunc     IN   VARCHAR2,
+      showproc       IN   VARCHAR2 := 'pl',
+      datatype       IN   VARCHAR2 := 'VARCHAR2(32767)'
+   )
+   IS
+      dynblock   VARCHAR2 (32767);
+   BEGIN
+      dynblock :=
+         'DECLARE 
+            indx PLS_INTEGER := ' || pkg ||
+            '.' ||
+            firstrowproc ||
+            ';
+            v_startloc PLS_INTEGER := 1;
+            v_item ' ||
+            datatype ||
+            ';
+          BEGIN 
+             LOOP
+                EXIT WHEN indx IS NULL;' ||
+            showproc ||
+            ' (' ||
+            pkg ||
+            '.' ||
+            getvalfunc ||
+            '(indx));
+                indx := ' ||
+            pkg ||
+            '.' ||
+            nextrowproc ||
+            '(indx);
+             END LOOP;
+          END;';
+      
+	  IF tracing THEN do.pl /* do.pkg */ ('STR2LIST: SHOW LIST - API:');do.pl /* do.pkg */ (dynblock); END IF;
+	  EXECUTE IMMEDIATE dynblock;
+   EXCEPTION
+      WHEN OTHERS
+      THEN
+         disperr (dynblock);
+   END;
+END str2list;
+/
+
+
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/
+

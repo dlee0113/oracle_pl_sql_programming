@@ -1,0 +1,125 @@
+/* These packages must be defined first. */
+
+@msginfo.pkg
+
+CREATE OR REPLACE PACKAGE errpkg
+IS
+   bulk_errors   EXCEPTION;
+   PRAGMA EXCEPTION_INIT (bulk_errors, -24381);
+
+   PROCEDURE RAISE (err_in IN INTEGER := SQLCODE, msg_in IN VARCHAR2 := NULL);
+
+   PROCEDURE record_and_stop (
+      err_in   IN   INTEGER := SQLCODE
+     ,msg_in   IN   VARCHAR2 := NULL
+   );
+
+   PROCEDURE record_and_continue (
+      err_in   IN   INTEGER := SQLCODE
+     ,msg_in   IN   VARCHAR2 := NULL
+   );
+
+   FUNCTION errtext (err_in IN INTEGER := SQLCODE)
+      RETURN VARCHAR2;
+END errpkg;
+/
+
+CREATE OR REPLACE PACKAGE BODY errpkg
+IS
+   PROCEDURE raise (err_in IN INTEGER := SQLCODE, msg_in IN VARCHAR2 := NULL)
+   IS
+   BEGIN
+      IF err_in BETWEEN -20999 AND -20000
+      THEN
+         raise_application_error (
+            err_in
+          , SUBSTR (NVL (msg_in, errtext (err_in)), 1, 255)
+         );
+      /* You can use positive error numbers -- lots to choose from! */
+      ELSIF err_in > 0 AND err_in NOT IN (1, 100)
+      THEN
+         raise_application_error (
+            -20000
+          , err_in || '-' || NVL (msg_in, errtext (err_in))
+         );
+      /* Can't EXCEPTION_INIT -1403, so we raise these explicitly */
+      ELSIF err_in IN (100, -1403)
+      THEN
+         RAISE NO_DATA_FOUND;
+      /* Re-raise any other exception using dynamic PL/SQL. */
+      ELSE
+         EXECUTE IMMEDIATE   'DECLARE myexc EXCEPTION; '
+                          || '   PRAGMA EXCEPTION_INIT (myexc, '
+                          || TO_CHAR (err_in)
+                          || ');'
+                          || 'BEGIN  RAISE myexc; END;';
+      END IF;
+   END;
+
+   PROCEDURE record_and_continue (err_in IN INTEGER:= SQLCODE
+                                , msg_in IN VARCHAR2:= NULL
+                                 )
+   IS
+   BEGIN
+      log_pkg.putline (err_in, NVL (msg_in, errtext (err_in)));
+   END;
+
+   PROCEDURE record_and_stop (err_in IN INTEGER:= SQLCODE
+                            , msg_in IN VARCHAR2:= NULL
+                             )
+   IS
+   BEGIN
+      record_and_continue (err_in, msg_in);
+      errpkg.raise (err_in);
+   END;
+
+   /* Let's use the msginfo package while we are at it!
+   FUNCTION errtext (err_in IN INTEGER := SQLCODE) RETURN VARCHAR2 IS
+      CURSOR txt_cur IS
+         SELECT text FROM message_text
+          WHERE texttype = 'EXCEPTION'
+            AND code = err_in;
+      txt_rec txt_cur%ROWTYPE;
+   BEGIN
+      OPEN txt_cur;
+      FETCH txt_cur INTO txt_rec;
+      IF txt_cur%NOTFOUND THEN
+         txt_rec.text := SQLERRM (err_in);
+      END IF;
+      RETURN txt_rec.text;
+   END;
+   */
+   FUNCTION errtext (err_in IN INTEGER := SQLCODE)
+      RETURN VARCHAR2
+   IS
+   BEGIN
+      RETURN msginfo.text (code_in => err_in
+                         , type_in => 'EXCEPTION'
+                         , use_sqlerrm => TRUE
+                          );
+   END;
+END errpkg;
+/
+
+/* Example of usage
+EXCEPTION
+   WHEN NO_DATA_FOUND
+   THEN 
+      errpkg.record_and_continue (
+         SQLCODE, 
+         ' No company for id ' || TO_CHAR (v_id));
+
+   WHEN OTHERS
+      THEN
+      errpkg.record_and_stop; 
+END;
+*/
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

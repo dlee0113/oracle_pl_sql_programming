@@ -1,0 +1,166 @@
+DROP TABLE books
+/
+
+CREATE TABLE books (
+   book_id INTEGER PRIMARY KEY,
+   isbn VARCHAR2(13) NOT NULL,
+   title VARCHAR2(200),
+   summary VARCHAR2(2000),
+   author VARCHAR2(200),
+   date_published DATE,
+   page_count NUMBER
+)
+/
+
+CREATE UNIQUE INDEX books_author_title_i ON books (author, title)
+/
+
+CREATE OR REPLACE PACKAGE summer_reading
+IS 
+   SUBTYPE author_title_t IS VARCHAR2 (500);
+
+   FUNCTION author_title (
+      author_in        books.author%TYPE,
+      title_in         books.title%TYPE,
+      delim_in    IN   VARCHAR2 := '^'
+   )
+      RETURN author_title_t;
+
+   FUNCTION onebook (book_id_in IN books.book_id%TYPE)
+      RETURN books%ROWTYPE;
+
+   FUNCTION onebook (isbn_in IN books.isbn%TYPE)
+      RETURN books%ROWTYPE;
+
+   FUNCTION onebook (author_in books.author%TYPE, title_in books.title%TYPE)
+      RETURN books%ROWTYPE;
+
+   -- Only call if you want to RE-load the data.
+   -- This is invoked automatically in the initialization section.
+   PROCEDURE load_arrays;
+
+   PROCEDURE set_reload_interval (interval_in IN NUMBER);
+   PROCEDURE set_reload_interval (interval_in IN INTERVAL DAY TO SECOND);
+END summer_reading;
+/
+
+CREATE OR REPLACE PACKAGE BODY summer_reading
+IS 
+   g_last_load DATE;
+   g_reload_interval INTERVAL DAY TO SECOND
+       := NULL; -- Auto reload turned off
+   
+   TYPE book_id_aat IS TABLE OF books%ROWTYPE
+      INDEX BY PLS_INTEGER;
+      
+   TYPE isbn_aat IS TABLE OF books.book_id%TYPE
+      INDEX BY books.isbn%TYPE;
+      
+   TYPE author_title_aat IS TABLE OF books.book_id%TYPE
+      INDEX BY author_title_t;
+      
+   books_aa             book_id_aat;
+   by_isbn_aa           isbn_aat;
+   by_author_title_aa   author_title_aat;
+
+   FUNCTION author_title (
+      author_in        books.author%TYPE,
+      title_in         books.title%TYPE,
+      delim_in    IN   VARCHAR2 := '^'
+   )
+      RETURN author_title_t
+   IS
+   BEGIN
+      RETURN UPPER (author_in) || delim_in || UPPER (title_in);
+   END;
+
+   PROCEDURE load_arrays
+   IS
+   BEGIN
+      DBMS_OUTPUT.PUT_LINE ('Reloading books arrays at ' ||
+	     TO_CHAR (SYSDATE, 'HH24:MI:SS'));
+	  
+      FOR rec IN (SELECT *
+                    FROM books)
+      LOOP
+         books_aa (rec.book_id) := rec;
+         by_isbn_aa (rec.isbn) := rec.book_id;
+         by_author_title_aa (author_title (rec.author, rec.title)) :=
+                                                                  rec.book_id;
+      END LOOP;
+	  g_last_load := SYSDATE;
+	  
+   /*-- Verify load process:
+  DBMS_OUTPUT.put_line (
+     'By ISBN: ' || by_isbn_aa.COUNT || ' rows defined.');
+  DBMS_OUTPUT.put_line (
+     'By Author/Title: ' || by_author_title_aa.COUNT || ' rows defined.'
+  );*/
+   END load_arrays;
+
+   PROCEDURE set_reload_interval (interval_in IN INTERVAL DAY TO SECOND)
+   IS
+   BEGIN
+      g_reload_interval := interval_in;
+   END;
+   
+   PROCEDURE set_reload_interval (interval_in IN NUMBER)
+   IS
+   BEGIN
+      g_reload_interval := NUMTODSINTERVAL (interval_in, 'SECOND');
+   END;
+   
+   FUNCTION reload_needed RETURN BOOLEAN
+   IS
+      retval BOOLEAN := g_reload_interval IS NOT NULL;
+	  l_date DATE := SYSDATE;
+   BEGIN
+      IF retval
+	  THEN
+	     retval := 
+		    NUMTODSINTERVAL (
+			   l_date - g_last_load,
+			   'DAY') > g_reload_interval;
+	  END IF;
+	  RETURN retval; 
+   END;
+
+   FUNCTION onebook (book_id_in IN books.book_id%TYPE)
+      RETURN books%ROWTYPE
+   IS
+   BEGIN
+      IF reload_needed THEN load_arrays; END IF;
+	  
+      RETURN books_aa (book_id_in);
+   END;
+
+   FUNCTION onebook (isbn_in IN books.isbn%TYPE)
+      RETURN books%ROWTYPE
+   IS
+   BEGIN
+      RETURN onebook (by_isbn_aa (isbn_in));
+   END;
+
+   FUNCTION onebook (author_in books.author%TYPE, title_in books.title%TYPE)
+      RETURN books%ROWTYPE
+   IS
+   BEGIN
+      RETURN 
+	     onebook (
+		    by_author_title_aa (
+			   author_title (author_in, title_in)));
+   END;
+BEGIN
+   load_arrays;
+END summer_reading;
+/
+
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

@@ -1,0 +1,122 @@
+DROP TYPE tmr_t FORCE;
+
+CREATE TYPE tmr_t AS OBJECT (
+   startTime INTEGER,
+   endTime INTEGER,
+   repetitions INTEGER,
+   name VARCHAR2(2000),   
+   MEMBER PROCEDURE go ,
+   MEMBER PROCEDURE stop (show_timing IN BOOLEAN := TRUE),   
+   MEMBER FUNCTION timing RETURN INTEGER,
+   MEMBER FUNCTION timing_desc  RETURN VARCHAR2,  
+   MEMBER PROCEDURE reset (name IN VARCHAR2 := NULL),    
+   STATIC FUNCTION make (
+      name IN VARCHAR2,
+      repetitions IN INTEGER := 1
+      )
+      RETURN tmr_t 
+);
+/
+
+CREATE OR REPLACE TYPE BODY tmr_t 
+AS
+   STATIC FUNCTION make (
+      name IN VARCHAR2,
+      repetitions IN INTEGER := 1
+      )
+      RETURN tmr_t
+   IS
+   BEGIN
+      RETURN tmr_t (NULL, NULL, NVL (repetitions, 1), name);
+   END;
+      
+   MEMBER PROCEDURE go IS
+   BEGIN
+      IF startTime IS NOT NULL
+      THEN
+         DBMS_OUTPUT.PUT_LINE (
+            'You have already started timer "' || name || '"');
+      ELSE
+         startTime := DBMS_UTILITY.GET_TIME;
+      END IF;
+   END;
+   
+   MEMBER PROCEDURE stop  (show_timing IN BOOLEAN := TRUE)
+   IS
+   BEGIN
+      IF endTime IS NOT NULL
+      THEN
+         DBMS_OUTPUT.PUT_LINE (
+            'You have already stopped timer "' || name || '"');
+      ELSE
+         endTime := DBMS_UTILITY.GET_TIME;
+         
+         IF show_timing
+         THEN
+            DBMS_OUTPUT.PUT_LINE (timing_desc);
+         END IF;
+      END IF;
+   END;
+   
+   MEMBER PROCEDURE reset  (name IN VARCHAR2 := NULL)IS
+   BEGIN
+      startTime := NULL;
+      endTime := NULL;
+      IF name IS NOT NULL
+      THEN
+         SELF.name := name;
+      END IF;
+   END;
+   
+   MEMBER FUNCTION timing RETURN INTEGER
+   IS
+   BEGIN
+      IF endTime IS NULL
+      THEN
+         DBMS_OUTPUT.PUT_LINE (
+            'You must stop timer "' || name || '"' ||
+            ' before you can get timing information.');
+      END IF;
+      
+      -- Avoid "epoch time" wrap around (thanks, Solomon Yakobson)
+      -- RETURN endTime - startTime; 
+      RETURN (
+         MOD (endTime - startTime + POWER(2,32), POWER(2,32)));
+   END;
+
+   MEMBER FUNCTION timing_desc RETURN VARCHAR2
+   IS
+      retval VARCHAR2(2000);
+   BEGIN
+      IF endTime IS NULL
+      THEN
+         DBMS_OUTPUT.PUT_LINE (
+            'You must stop timer "' || name || '"' ||
+            ' before you can get timing information.');
+      END IF;
+      
+      retval :=
+         'Elapsed time for "' || name || '" = ' ||
+         TO_CHAR (timing / 100) || ' seconds.';
+         
+      IF NVL (repetitions, 1) > 1 
+      THEN
+         retval := retval ||
+            ' Per repetition timing = ' || 
+            TO_CHAR ((timing / 100) / repetitions) || ' seconds.';
+      END IF; 
+      
+      RETURN retval;
+   END;
+END;
+/
+
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

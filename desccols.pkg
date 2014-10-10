@@ -1,0 +1,104 @@
+CREATE OR REPLACE PACKAGE desccols
+IS
+   FUNCTION for_query ( query_in IN VARCHAR2 )
+      RETURN DBMS_SQL.desc_tab;
+
+   FUNCTION for_cursor ( cur_in IN PLS_INTEGER )
+      RETURN DBMS_SQL.desc_tab;
+
+   PROCEDURE show_columns ( col_list_in IN DBMS_SQL.desc_tab );
+
+   PROCEDURE show_columns ( query_in IN VARCHAR2 );
+
+   PROCEDURE show_columns ( cur_in IN PLS_INTEGER );
+END desccols;
+/
+
+CREATE OR REPLACE PACKAGE BODY desccols
+IS
+   FUNCTION error_backtrace
+      RETURN VARCHAR2
+   IS
+      l_backtrace VARCHAR2 ( 32767 );
+   BEGIN
+      EXECUTE IMMEDIATE 'BEGIN :val := DBMS_UTILITY.format_error_backtrace; END;'
+                  USING OUT l_backtrace;
+
+      RETURN l_backtrace;
+   EXCEPTION
+      WHEN OTHERS
+      THEN
+         RETURN NULL;
+   END error_backtrace;
+
+   FUNCTION for_cursor ( cur_in IN PLS_INTEGER )
+      RETURN DBMS_SQL.desc_tab
+   IS
+      retval DBMS_SQL.desc_tab;
+      l_count PLS_INTEGER;
+   BEGIN
+      -- Get the column information
+      DBMS_SQL.describe_columns ( cur_in, l_count, retval );
+      RETURN retval;
+   END for_cursor;
+
+   FUNCTION for_query ( query_in IN VARCHAR2 )
+      RETURN DBMS_SQL.desc_tab
+   IS
+      cur PLS_INTEGER := DBMS_SQL.open_cursor;
+      l_count PLS_INTEGER;
+      retval DBMS_SQL.desc_tab;
+   BEGIN
+      -- Parse the query and then get the columns.
+      DBMS_SQL.parse ( cur, query_in, DBMS_SQL.native );
+      retval := for_cursor ( cur );
+      DBMS_SQL.close_cursor ( cur );
+      RETURN retval;
+   EXCEPTION
+      WHEN OTHERS
+      THEN
+         DBMS_OUTPUT.put_line ( DBMS_UTILITY.format_call_stack );
+         -- Display the error backtrace, if it is available.
+         DBMS_OUTPUT.put_line ( error_backtrace );
+         DBMS_SQL.close_cursor ( cur );
+         RAISE;
+   END for_query;
+
+   PROCEDURE show_columns ( col_list_in IN DBMS_SQL.desc_tab )
+   IS
+   BEGIN
+      FOR colind IN 1 .. col_list_in.COUNT
+      LOOP
+         -- Display other attributes, as desired.
+         DBMS_OUTPUT.put_line ( 'Column ' || TO_CHAR ( colind ));
+         DBMS_OUTPUT.put_line ( '   Name = '
+                                || col_list_in ( colind ).col_name
+                              );
+         DBMS_OUTPUT.put_line ( '   Type = '
+                                || col_list_in ( colind ).col_type
+                              );
+      END LOOP;
+   END show_columns;
+
+   PROCEDURE show_columns ( query_in IN VARCHAR2 )
+   IS
+   BEGIN
+      show_columns ( for_query ( query_in ));
+   END show_columns;
+
+   PROCEDURE show_columns ( cur_in IN PLS_INTEGER )
+   IS
+   BEGIN
+      show_columns ( for_cursor ( cur_in ));
+   END show_columns;
+END desccols;
+/
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

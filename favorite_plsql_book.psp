@@ -1,0 +1,18 @@
+<%@ page language="PL/SQL" %>
+<%@ plsql procedure="favorite_plsql_book" %>
+<HTML>
+   <HEAD>
+      <TITLE>My favorite book about PL/SQL</TITLE>
+   </HEAD>
+   <BODY>
+      <%= booktitle( '0-596-00180-0') %>
+   </BODY>
+</HTML>
+
+
+<!======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+-->

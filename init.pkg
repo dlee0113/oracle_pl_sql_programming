@@ -1,0 +1,113 @@
+/* Formatted on 2001/05/14 04:36 (RevealNet Formatter v4.4.0) */
+DROP TABLE USER_CONFIG;
+
+CREATE TABLE USER_CONFIG (
+   username VARCHAR2(30),
+   printer VARCHAR2(100),
+   show_lov CHAR(1),
+   show_toolbar CHAR(1)
+   );
+
+INSERT INTO USER_CONFIG
+     VALUES ('*DEFAULT*', 'lpt1', 'Y', 'Y');
+
+INSERT INTO USER_CONFIG
+   SELECT username, 'lpt1', 'Y', 'Y'
+     FROM all_users
+    WHERE username NOT IN ('SYS', 'SYSTEM');
+
+UPDATE USER_CONFIG
+   SET printer = 'lpt26',
+       show_lov = 'N',
+       show_toolbar = 'N'
+ WHERE username = 'SCOTT';
+
+CREATE OR REPLACE PACKAGE Sessinit
+IS
+   FUNCTION show_lov
+      RETURN user_config.show_lov%TYPE; -- Moorgate 9/2001
+
+   FUNCTION show_toolbar
+      RETURN VARCHAR2;
+
+   FUNCTION printer
+      RETURN VARCHAR2;
+END Sessinit;
+/
+CREATE OR REPLACE PACKAGE BODY Sessinit
+IS
+   c_default   CONSTANT CHAR (9)              := '*DEFAULT*';
+   /* Don't use variables; use a record!
+   g_show_lov user_config.show_lov%TYPE;
+   g_show_toolbar user_config.show_toolbar%TYPE;
+   g_printer user_config.printer%TYPE;
+   */
+
+   g_user               USER_CONFIG%ROWTYPE;
+
+   CURSOR user_cur (nm IN VARCHAR2)
+   IS
+      SELECT *
+        FROM USER_CONFIG
+       WHERE username = nm;
+
+   FUNCTION show_lov
+      RETURN user_config.show_lov%TYPE
+   IS
+   BEGIN
+      RETURN g_user.show_lov;
+   END;
+
+   FUNCTION show_toolbar
+      RETURN VARCHAR2
+   IS
+   BEGIN
+      RETURN g_user.show_toolbar;
+   END;
+
+   FUNCTION printer
+      RETURN VARCHAR2
+   IS
+   BEGIN
+      RETURN g_user.printer;
+   END;
+
+/* Initialize Globals */
+BEGIN
+   /* Get user preferences for this user. */
+   OPEN user_cur (USER);
+   FETCH user_cur INTO g_user;
+
+   IF user_cur%NOTFOUND
+   THEN
+      /* Use the defaults. */
+      CLOSE user_cur;
+      OPEN user_cur (c_default);
+      FETCH user_cur INTO g_user;
+
+      IF user_cur%NOTFOUND -- TVP 5/14/2001
+      THEN
+         CLOSE user_cur;
+         Errpkg.RAISE;
+      END IF;
+   END IF;
+
+   CLOSE user_cur;
+EXCEPTION
+   WHEN OTHERS -- TVP 5/14/2001
+   THEN
+      IF user_cur%ISOPEN
+      THEN
+         CLOSE user_cur;
+      END IF;
+END Sessinit;
+/
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

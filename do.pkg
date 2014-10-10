@@ -1,0 +1,137 @@
+CREATE OR REPLACE PACKAGE do
+IS
+   /* The overloaded versions of the pl procedure */
+
+   /* Display a date. Can specify a format mask or use the default. */
+   PROCEDURE pl (date_in IN DATE
+               , mask_in IN VARCHAR2:= 'Month DD, YYYY - HH:MI:SS PM'
+                );
+
+   /* Display a number. */
+   PROCEDURE pl (number_in IN NUMBER);
+
+   /* Display a string. */
+   PROCEDURE pl (char_in IN VARCHAR2);
+
+   /* Display two strings. */
+   PROCEDURE pl (char1_in IN VARCHAR2, char2_in IN VARCHAR2);
+
+   /* Display a string followed by a number. */
+   PROCEDURE pl (char_in IN VARCHAR2, number_in IN NUMBER);
+
+   /* Display a string followed by a date. */
+   PROCEDURE pl (char_in IN VARCHAR2
+               , date_in IN DATE
+               , mask_in IN VARCHAR2:= 'Month DD, YYYY - HH:MI:SS PM'
+                );
+
+   /* Display a Boolean value. */
+   PROCEDURE pl (boolean_in IN BOOLEAN);
+
+   /* Display a string and then a Boolean value. */
+   PROCEDURE pl (char_in IN VARCHAR2, boolean_in IN BOOLEAN);
+
+   PROCEDURE pl (xml_in IN SYS.XMLTYPE);
+END do;
+/
+
+CREATE OR REPLACE PACKAGE BODY do
+IS
+   /*------------------- Private Modules -------------------*/
+
+   PROCEDURE display_line (line_in IN VARCHAR2)
+   IS
+   BEGIN
+      DBMS_OUTPUT.put_line (line_in);
+   END;
+
+   FUNCTION boolean_string (boolean_in IN BOOLEAN
+                          , char_in IN VARCHAR2:= NULL
+                           )
+      RETURN VARCHAR2
+   IS
+   BEGIN
+      IF boolean_in
+      THEN
+         RETURN char_in || ' ' || 'TRUE';
+      ELSE
+         RETURN char_in || ' ' || 'FALSE';
+      END IF;
+   END;
+
+   /*------------------ The pl Procedures ----------------*/
+
+   PROCEDURE pl (date_in IN DATE
+               , mask_in IN VARCHAR2:= 'Month DD, YYYY - HH:MI:SS PM'
+                )
+   IS
+   BEGIN
+      display_line (TO_CHAR (date_in, mask_in));
+   END;
+
+   PROCEDURE pl (number_in IN NUMBER)
+   IS
+   BEGIN
+      display_line (number_in);
+   END;
+
+   PROCEDURE pl (char_in IN VARCHAR2)
+   IS
+   BEGIN
+      display_line (char_in);
+   END;
+
+   /* Display two strings. */
+   PROCEDURE pl (char1_in IN VARCHAR2, char2_in IN VARCHAR2)
+   IS
+   BEGIN
+      display_line (char1_in || ': ' || char2_in);
+   END;
+
+   PROCEDURE pl (char_in IN VARCHAR2, number_in IN NUMBER)
+   IS
+   BEGIN
+      display_line (char_in || ': ' || TO_CHAR (number_in));
+   END;
+
+   PROCEDURE pl (char_in IN VARCHAR2
+               , date_in IN DATE
+               , mask_in IN VARCHAR2:= 'Month DD, YYYY - HH:MI:SS PM'
+                )
+   IS
+   BEGIN
+      display_line (char_in || ': ' || TO_CHAR (date_in, mask_in));
+   END;
+
+   PROCEDURE pl (boolean_in IN BOOLEAN)
+   /*
+  || I will even let you look at Boolean variables!
+  */
+   IS
+   BEGIN
+      display_line (boolean_string (boolean_in));
+   END;
+
+   PROCEDURE pl (char_in IN VARCHAR2, boolean_in IN BOOLEAN)
+   IS
+   BEGIN
+      display_line (boolean_string (boolean_in, char_in));
+   END;
+
+   PROCEDURE pl (xml_in IN SYS.XMLTYPE)
+   IS
+   BEGIN
+      display_line (xml_in.getstringval ());
+   END;
+END do;
+/
+
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

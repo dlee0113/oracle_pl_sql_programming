@@ -1,0 +1,205 @@
+CREATE OR REPLACE PACKAGE ndsutil
+   AUTHID CURRENT_USER
+/*
+|| Utility package of Native Dynamic SQL utilities.
+||
+|| Author: Steven Feuerstein, sfinfo@stevenfeuerstein.com
+||   
+|| Copyright 1999, all rights reserved.
+*/
+IS
+   TYPE cv_type IS REF CURSOR;
+   
+   TYPE results_rt IS RECORD (
+      val VARCHAR2(4000),
+      countby INTEGER);
+      
+   TYPE results_tt IS TABLE OF results_rt 
+      INDEX BY BINARY_INTEGER;
+
+   PROCEDURE execImmed (sql_string IN VARCHAR2);
+   
+   FUNCTION openFor (sql_string IN VARCHAR2) RETURN cv_type;
+   
+   FUNCTION tabCount (
+      tab IN VARCHAR2,
+      whr IN VARCHAR2 := NULL,
+      sch IN VARCHAR2 := NULL)
+      RETURN INTEGER;
+      
+   FUNCTION countBy (
+      tab IN VARCHAR2,
+      col IN VARCHAR2, 
+      atleast IN INTEGER := NULL,
+      sch IN VARCHAR2 := NULL,
+      maxlen IN INTEGER := 30)
+      RETURN results_tt;
+
+   PROCEDURE showCol (
+      tab IN VARCHAR2,
+      col IN VARCHAR2,
+      whr IN VARCHAR2 := NULL);
+
+   PROCEDURE dynPLSQL (blk IN VARCHAR2);   
+END;
+/
+CREATE OR REPLACE PACKAGE BODY ndsutil
+/*
+|| Utility package of Native Dynamic SQL utilities.
+||
+|| Author: Steven Feuerstein, sfinfo@stevenfeuerstein.com
+||   
+|| Copyright 1999, all rights reserved.
+*/
+IS
+   PROCEDURE showerr (prog IN VARCHAR2, sql_string IN VARCHAR2)
+   IS
+   BEGIN
+      DBMS_OUTPUT.PUT_LINE (
+         'NDSUtil Failure in ' || prog || ': ' || SQLERRM);
+      DBMS_OUTPUT.PUT_LINE (
+         '   on statement: "' || sql_string || '"');
+   END;
+
+   PROCEDURE execImmed (sql_string IN VARCHAR2) 
+   IS
+   BEGIN
+      EXECUTE IMMEDIATE sql_string;
+   EXCEPTION
+      WHEN OTHERS
+      THEN
+         showerr ('execImmed', sql_string);
+         RAISE;
+   END;
+
+   FUNCTION openFor (sql_string IN VARCHAR2) RETURN cv_type
+   IS
+      retval cv_type;
+   BEGIN
+      OPEN retval FOR sql_string;
+   EXCEPTION
+      WHEN OTHERS
+      THEN
+         showerr ('openFor', sql_string);
+         RAISE;
+   END;
+   
+   FUNCTION tabCount (
+      tab IN VARCHAR2,
+      whr IN VARCHAR2 := NULL,
+      sch IN VARCHAR2 := NULL)
+      RETURN INTEGER 
+   IS
+      retval INTEGER;
+      SQL_string VARCHAR2(32767) := 
+         'SELECT COUNT(*) 
+            FROM ' || NVL (sch, USER) || '.' || tab ||
+         ' WHERE ' || NVL (whr, '1=1');
+   BEGIN
+      EXECUTE IMMEDIATE SQL_string INTO retval;
+      RETURN retval;
+   EXCEPTION
+      WHEN OTHERS
+      THEN
+         showerr ('tabCount', SQL_string);
+         RETURN NULL;
+   END;
+
+   FUNCTION countBy (
+      tab IN VARCHAR2,
+      col IN VARCHAR2, 
+      atleast IN INTEGER := NULL,
+      sch IN VARCHAR2 := NULL,
+      maxlen IN INTEGER := 30)
+      RETURN results_tt 
+   IS
+      cv cv_type;
+      
+      SQL_string VARCHAR2(32767) := 
+         'SELECT ' || col || ', COUNT(*) 
+            FROM ' || NVL (sch, USER) || '.' || tab ||
+         ' GROUP BY ' || col;
+      
+      rec results_rt;
+      nulltab results_tt;
+      retval results_tt;
+   BEGIN
+      IF atleast IS NOT NULL
+      THEN
+         SQL_string := SQL_string || ' HAVING COUNT(*) >= ' || atleast;
+      END IF;
+    
+      OPEN cv FOR SQL_String;
+      
+      LOOP
+         FETCH cv INTO rec;
+         EXIT WHEN cv%NOTFOUND;
+         retval(cv%ROWCOUNT) := rec;
+      END LOOP;
+      
+      CLOSE cv;
+      
+      RETURN retval;
+   EXCEPTION
+      WHEN OTHERS
+      THEN
+         showerr ('countBy', sql_string);
+         RETURN nulltab;
+   END;
+   
+   PROCEDURE showCol (
+      tab IN VARCHAR2,
+      col IN VARCHAR2,
+      whr IN VARCHAR2 := NULL)
+   IS
+      cv cv_type; 
+      val VARCHAR2(32767);  
+      
+      SQL_string VARCHAR2(32767) := 
+         'SELECT ' || col || 
+         '  FROM ' || tab ||
+         ' WHERE ' || NVL (whr, '1 = 1');
+   BEGIN
+      OPEN cv FOR SQL_string;
+         
+      LOOP
+         FETCH cv INTO val;
+         EXIT WHEN cv%NOTFOUND;
+         IF cv%ROWCOUNT = 1
+         THEN
+            DBMS_OUTPUT.PUT_LINE (RPAD ('-', 60, '-'));
+            DBMS_OUTPUT.PUT_LINE (
+               'Contents of ' || 
+               UPPER (tab) || '.' || UPPER (col));
+            DBMS_OUTPUT.PUT_LINE (RPAD ('-', 60, '-'));
+         END IF;
+         DBMS_OUTPUT.PUT_LINE (val);
+      END LOOP;
+      
+      CLOSE cv;
+   EXCEPTION
+      WHEN OTHERS
+      THEN
+         showerr ('showCol', sql_string);
+         RAISE;
+   END;
+
+   PROCEDURE dynPLSQL (blk IN VARCHAR2)
+   IS
+   BEGIN
+      execImmed (
+         'BEGIN ' || RTRIM (blk, ';') || '; END;');
+   END;   
+END ndsutil;
+/
+   
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/
+

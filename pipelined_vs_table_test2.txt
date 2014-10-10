@@ -1,0 +1,28 @@
+
+Session altered.
+
+Elapsed: 00:00:00.00
+
+Running pipelined in a loop...
+===============================================
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:02:36.32
+
+Running table in a loop...
+===============================================
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:02:24.29
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/
+

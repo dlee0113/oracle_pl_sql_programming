@@ -1,0 +1,112 @@
+CREATE OR REPLACE PACKAGE plsql_memory
+/*
+Overview: Calculate and show UGA and PGA memory consumption
+          by the current session.
+
+Author: Steven Feuerstein
+
+Dependencies:
+
+
+    SELECT privileges required on:
+       SYS.v_$mystat
+       SYS.v_$statname
+
+    Here are the statements you should run:
+
+    GRANT SELECT ON SYS.v_$mystat TO schema;
+    GRANT SELECT ON SYS.v_$statname TO schema;
+*/
+IS
+   PROCEDURE reset_analysis;
+
+   PROCEDURE start_analysis;
+
+   PROCEDURE show_memory_usage;
+END plsql_memory;
+/
+
+
+CREATE OR REPLACE PACKAGE BODY plsql_memory
+IS
+   g_uga_start   PLS_INTEGER;
+   g_pga_start   PLS_INTEGER;
+
+   FUNCTION statval (statname_in IN VARCHAR2)
+      RETURN NUMBER
+   IS
+      l_memory   PLS_INTEGER;
+   BEGIN
+      SELECT s.VALUE
+        INTO l_memory
+        FROM sys.v_$mystat s, sys.v_$statname n
+       WHERE s.statistic# = n.statistic# AND n.name = statname_in;
+
+
+      RETURN l_memory;
+   END statval;
+
+   PROCEDURE reset_analysis
+   IS
+   BEGIN
+      g_uga_start := NULL;
+      g_pga_start := NULL;
+   END reset_analysis;
+
+   PROCEDURE get_memory_data (uga_out OUT PLS_INTEGER
+                            , pga_out OUT PLS_INTEGER
+                             )
+   IS
+   BEGIN
+      uga_out := statval ('session uga memory');
+      pga_out := statval ('session pga memory');
+   END get_memory_data;
+
+   PROCEDURE start_analysis
+   IS
+   BEGIN
+      get_memory_data (g_uga_start, g_pga_start);
+   END start_analysis;
+
+   PROCEDURE show_memory_usage
+   IS
+      l_uga_usage   PLS_INTEGER;
+      l_pga_usage   PLS_INTEGER;
+   BEGIN
+      get_memory_data (l_uga_usage, l_pga_usage);
+
+
+      IF g_uga_start IS NULL
+      THEN
+         DBMS_OUTPUT.put_line ('   UGA memory: ' || l_uga_usage);
+      ELSE
+         DBMS_OUTPUT.put_line(   '   Change in UGA memory: '
+                              || TO_CHAR (l_uga_usage - g_uga_start)
+                              || ' (Current = '
+                              || TO_CHAR (l_uga_usage)
+                              || ')');
+      END IF;
+
+
+      IF g_pga_start IS NULL
+      THEN
+         DBMS_OUTPUT.put_line ('   PGA memory: ' || l_pga_usage);
+      ELSE
+         DBMS_OUTPUT.put_line(   '   Change in PGA memory: '
+                              || TO_CHAR (l_pga_usage - g_pga_start)
+                              || ' (Current = '
+                              || TO_CHAR (l_pga_usage)
+                              || ')');
+      END IF;
+   END show_memory_usage;
+END plsql_memory;
+/
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

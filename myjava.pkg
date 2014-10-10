@@ -1,0 +1,97 @@
+CREATE OR REPLACE PACKAGE myJava
+IS
+   PROCEDURE showobjects (
+      nm IN VARCHAR2 := NULL);
+   
+   PROCEDURE showlongnames (
+      nm IN VARCHAR2 := NULL);
+END myJava;
+/
+CREATE OR REPLACE PACKAGE BODY myJava
+IS
+   CURSOR jobj_cur (nm IN VARCHAR2 := NULL)
+   IS
+      SELECT object_name, object_type, status, timestamp
+        FROM user_objects
+       WHERE object_name LIKE NVL (nm, '%')
+         AND (object_name NOT LIKE 'SYS_%'
+               AND object_name NOT LIKE 'CREATE$%'
+               AND object_name NOT LIKE 'JAVA$%'
+               AND object_name NOT LIKE 'LOADLOB%')
+         AND object_type LIKE 'JAVA %'
+       ORDER BY object_type, object_name;
+
+   CURSOR long_cur (nm IN VARCHAR2 := NULL)
+   IS
+      SELECT object_name shortname,
+             DBMS_JAVA.LONGNAME (object_name) longname
+        FROM USER_OBJECTS 
+        WHERE object_type LIKE 'JAVA %'
+          AND object_name LIKE NVL (nm, '%')
+          AND object_name != DBMS_JAVA.LONGNAME (object_name);
+       
+   PROCEDURE showline (
+      nm IN VARCHAR2 DEFAULT '-', 
+      tp IN VARCHAR2 DEFAULT '-', 
+      st IN VARCHAR2 DEFAULT '-', 
+      ts IN VARCHAR2 DEFAULT '-',
+      padwith IN VARCHAR2 := ' ')
+   IS
+   BEGIN
+      DBMS_OUTPUT.PUT_LINE (
+         RPAD (nm, 31, padwith) ||
+         RPAD (tp, 14, padwith) ||
+         RPAD (st, 8, padwith) ||
+         RPAD (ts, 16, padwith));   
+   END;
+
+   PROCEDURE showobjects (nm IN VARCHAR2 := NULL)
+   IS
+   BEGIN
+      FOR jobj IN jobj_cur (nm)
+      LOOP
+         IF jobj_cur%ROWCOUNT = 1
+         THEN
+            showline (
+               'Object Name', 'Object Type', 
+               'Status', 'Timestamp');
+            showline (padwith => '-');
+         END IF;
+         showline (
+            jobj.object_name,
+            jobj.object_type,
+            jobj.status,
+            jobj.timestamp);
+      END LOOP;
+   END;
+   
+   PROCEDURE showlongnames (
+      nm IN VARCHAR2 := NULL)
+   IS
+   BEGIN
+      FOR jlong IN long_cur (nm)
+      LOOP
+         IF long_cur%ROWCOUNT = 1
+         THEN
+            DBMS_OUTPUT.PUT_LINE (
+               'Short Name | Long Name');
+            showline (padwith => '-');
+         END IF;
+         DBMS_OUTPUT.PUT_LINE (
+            'Short: ' || jlong.shortname || CHR(10) ||
+            'Long:  ' || jlong.longname);
+      END LOOP;
+   END;
+   
+END myJava;
+/
+
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

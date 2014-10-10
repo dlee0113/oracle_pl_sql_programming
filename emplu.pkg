@@ -1,0 +1,74 @@
+CREATE OR REPLACE PACKAGE emplu1
+IS
+   FUNCTION onerow (
+      employee_id_in IN employee.employee_id%TYPE
+      )
+   RETURN employee%ROWTYPE;
+END;
+/
+CREATE OR REPLACE PACKAGE BODY emplu1
+IS
+   FUNCTION onerow (
+      employee_id_in IN employee.employee_id%TYPE
+      )
+   RETURN employee%ROWTYPE
+   IS
+      CURSOR onerow_cur
+      IS
+         SELECT *
+           FROM employee
+          WHERE
+         employee_id = employee_id_in;
+
+      onerow_rec employee%ROWTYPE;
+   BEGIN
+      OPEN onerow_cur;
+      FETCH onerow_cur INTO onerow_rec;
+      CLOSE onerow_cur;
+      RETURN onerow_rec;
+   END;
+END;
+/
+CREATE OR REPLACE PACKAGE emplu2
+IS
+   FUNCTION onerow (
+      employee_id_in IN employee.employee_id%TYPE
+      )
+   RETURN employee%ROWTYPE;
+END;
+/
+CREATE OR REPLACE PACKAGE BODY emplu2
+IS
+   TYPE tab_tabtype IS TABLE OF employee%ROWTYPE INDEX BY BINARY_INTEGER;
+   loadtab tab_tabtype;
+
+   FUNCTION onerow (
+      employee_id_in IN employee.employee_id%TYPE
+      )
+   RETURN employee%ROWTYPE
+   IS
+   BEGIN
+      RETURN loadtab (employee_id_in);
+   EXCEPTION
+      WHEN NO_DATA_FOUND
+      THEN
+         RETURN emplu1.onerow (employee_id_in);
+   END;
+
+BEGIN
+   FOR rec IN (SELECT * FROM employee)
+   LOOP
+      loadtab (rec.employee_id) := rec;
+   END LOOP;
+END;
+/
+
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

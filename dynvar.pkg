@@ -1,0 +1,73 @@
+CREATE OR REPLACE PACKAGE dynvar
+   AUTHID CURRENT_USER
+IS
+   PROCEDURE assign (expr_in IN VARCHAR2, var_inout IN OUT VARCHAR2);
+   FUNCTION val (var_in IN VARCHAR2) RETURN VARCHAR2;
+   PROCEDURE copyto (val_in IN VARCHAR2, nm_in IN VARCHAR2);
+END dynvar;
+/
+CREATE OR REPLACE PACKAGE BODY dynvar
+IS
+   PROCEDURE showerr (prog IN VARCHAR2, sql_string IN VARCHAR2)
+   IS
+   BEGIN
+      DBMS_OUTPUT.PUT_LINE (
+         'DynVar Failure in ' || prog || ': ' || SQLERRM);
+      DBMS_OUTPUT.PUT_LINE (
+         '   on statement: "' || sql_string || '"');
+   END;
+
+   PROCEDURE assign (expr_in IN VARCHAR2, var_inout IN OUT VARCHAR2)
+       
+   IS
+      plsql_string VARCHAR2(4000) :=
+         'BEGIN :var := ''' || expr_in || '''; END;'; 
+   BEGIN
+      EXECUTE IMMEDIATE plsql_string USING OUT var_inout;
+   EXCEPTION
+      WHEN OTHERS
+      THEN
+         showerr ('assign', plsql_string);
+         RAISE;
+   END;
+
+   FUNCTION val (var_in IN VARCHAR2) RETURN VARCHAR2 
+   IS
+      plsql_string VARCHAR2(4000) := 
+         'BEGIN :val := ' || var_in || '; END;';
+      retval VARCHAR2(2000);
+   BEGIN
+      EXECUTE IMMEDIATE plsql_string USING OUT retval;
+   EXCEPTION
+      WHEN OTHERS
+      THEN
+         showerr ('val', plsql_string);
+         RAISE;
+   END;
+
+   PROCEDURE copyto (val_in IN VARCHAR2, nm_in IN VARCHAR2) 
+   IS
+      plsql_string VARCHAR2(4000) :=
+         'BEGIN ' || nm_in || ' := ''' || val_in || '''; END;'; 
+   BEGIN
+      EXECUTE IMMEDIATE plsql_string; 
+   EXCEPTION
+      WHEN OTHERS
+      THEN
+         showerr ('copyto', plsql_string);
+         RAISE;
+   END;
+   
+END dynvar;
+/
+
+ 
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

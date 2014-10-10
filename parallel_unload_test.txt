@@ -1,0 +1,46 @@
+
+Legacy unload (1 million rows)...
+===============================================
+1000000 rows unloaded
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:23.64
+
+Parallel unload...
+===============================================
+
+FILE_NAME                      NO_RECORDS SESSION_ID
+------------------------------ ---------- ----------
+tickertable_144.txt                260788        144
+tickertable_142.txt                252342        142
+tickertable_127.txt                233765        127
+tickertable_112.txt                253105        112
+
+4 rows selected.
+
+Elapsed: 00:00:12.21
+
+Parallel buffered unload...
+===============================================
+
+FILE_NAME                      NO_RECORDS SESSION_ID
+------------------------------ ---------- ----------
+tickertable_112.txt                271961        112
+tickertable_127.txt                253071        127
+tickertable_144.txt                240979        144
+tickertable_142.txt                233989        142
+
+4 rows selected.
+
+Elapsed: 00:00:06.82
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/
+

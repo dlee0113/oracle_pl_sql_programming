@@ -1,0 +1,77 @@
+CREATE OR REPLACE FUNCTION program_type (
+   owner_in     IN   VARCHAR2
+ , package_in   IN   VARCHAR2
+ , program_in   IN   VARCHAR2
+)
+   RETURN VARCHAR2
+IS
+   c_function_pos   CONSTANT PLS_INTEGER      := 0;
+
+   TYPE overload_aat IS TABLE OF all_arguments.overload%TYPE
+      INDEX BY PLS_INTEGER;
+
+   l_overloads               overload_aat;
+   retval                    VARCHAR2 (32767);
+
+   FUNCTION list_to_string (
+      list_in       IN   overload_aat
+    , delim_in      IN   VARCHAR2 DEFAULT ','
+    , distinct_in   IN   BOOLEAN DEFAULT FALSE
+   )
+      RETURN VARCHAR2
+   IS
+      l_row         PLS_INTEGER;
+      l_add_value   BOOLEAN;
+      retval        VARCHAR2 (32767);
+
+      PROCEDURE add_item
+      IS
+      BEGIN
+         retval := retval || delim_in || list_in (l_row);
+      END add_item;
+   BEGIN
+      l_row := list_in.FIRST;
+
+      WHILE (l_row IS NOT NULL)
+      LOOP
+         -- Decide if this value should be added.
+         -- Only an issue if the user has specified DISTINCT.
+         IF NOT distinct_in OR retval IS NULL
+         THEN
+            add_item;
+         ELSIF distinct_in AND INSTR (retval, delim_in || list_in (l_row)) = 0
+         THEN
+            add_item;
+         END IF;
+
+         l_row := list_in.NEXT (l_row);
+      END LOOP;
+
+      RETURN LTRIM (retval, delim_in);
+   END list_to_string;
+BEGIN
+   SELECT   DECODE (MIN (POSITION), 0, 'FUNCTION', 'PROCEDURE')
+   BULK COLLECT INTO l_overloads
+       FROM all_arguments
+      WHERE owner = owner_in
+        AND package_name = package_in
+        AND object_name = program_in
+   GROUP BY overload;
+
+   IF l_overloads.COUNT > 0
+   THEN
+      retval := list_to_string (l_overloads, ',', distinct_in => TRUE);
+   END IF;
+
+   RETURN retval;
+END program_type;
+/
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

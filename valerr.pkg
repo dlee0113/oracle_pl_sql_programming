@@ -1,0 +1,35 @@
+CREATE OR REPLACE PACKAGE valerr
+IS
+   FUNCTION get RETURN VARCHAR2;
+END valerr;
+/
+CREATE OR REPLACE PACKAGE BODY valerr
+IS
+   -- A package-level, but private global variable
+   v VARCHAR2(1) := 'abc';
+
+   FUNCTION get RETURN VARCHAR2 
+   IS
+   BEGIN
+      RETURN v;
+   END;
+BEGIN
+   DBMS_OUTPUT.PUT_LINE  ('Before I show you v...');
+
+EXCEPTION
+  WHEN OTHERS 
+  THEN
+    DBMS_OUTPUT.PUT_LINE  ('Trapped the error!');
+	 
+END valerr;
+/
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/
+
+

@@ -1,0 +1,102 @@
+CREATE OR REPLACE PACKAGE anynums_pkg
+IS
+   TYPE numbers_t IS TABLE OF NUMBER;
+
+   FUNCTION getvals (num_satisfies_in   IN   VARCHAR2 := NULL)
+      RETURN numbers_t;
+END anynums_pkg;
+/
+CREATE OR REPLACE PACKAGE BODY anynums_pkg
+IS
+   PROCEDURE pl (
+      str         IN   VARCHAR2,
+      len         IN   INTEGER := 80,
+      expand_in   IN   BOOLEAN := TRUE
+   )
+   IS
+      v_len   PLS_INTEGER     := LEAST (len, 255);
+      v_str   VARCHAR2 (2000);
+   BEGIN
+      IF LENGTH (str) > v_len
+      THEN
+         v_str := SUBSTR (str, 1, v_len);
+         DBMS_OUTPUT.put_line (v_str);
+         pl (SUBSTR (str,   len
+                          + 1), v_len, expand_in);
+      ELSE
+         v_str := str;
+         DBMS_OUTPUT.put_line (v_str);
+      END IF;
+   EXCEPTION
+      WHEN OTHERS
+      THEN
+         IF expand_in
+         THEN
+            DBMS_OUTPUT.ENABLE (1000000);
+            DBMS_OUTPUT.put_line (v_str);
+         ELSE
+            RAISE;
+         END IF;
+   END;
+
+   FUNCTION getvals (num_satisfies_in   IN   VARCHAR2 := NULL
+   )
+      RETURN numbers_t
+   IS
+      retval       numbers_t        := numbers_t ();
+      l_type       anytype;
+      l_typecode   PLS_INTEGER;
+      l_value      NUMBER;
+      l_dummy      PLS_INTEGER;
+      l_filter     VARCHAR2 (32767);
+      l_include    BOOLEAN;
+   BEGIN
+      FOR rec IN  (SELECT DATA
+                     FROM wild_side)
+      LOOP
+         l_typecode := rec.DATA.gettype (l_type /* OUT */);
+
+         IF l_typecode = dbms_types.typecode_number
+         THEN
+            l_dummy := rec.DATA.getnumber (l_value /* OUT */);
+            l_include := num_satisfies_in IS NULL;
+
+            IF NOT l_include
+            THEN
+               l_filter :=
+                        'DECLARE l_bool BOOLEAN; BEGIN l_bool := :invalue '
+                     || num_satisfies_in
+                     || '; IF l_bool THEN :intval := 1; ELSE :intval := 0; END IF; END;';
+               EXECUTE IMMEDIATE l_filter USING  IN l_value,  OUT l_dummy;
+               l_include := l_dummy = 1;
+            END IF;
+
+            IF l_include
+            THEN
+               retval.EXTEND;
+               retval (retval.LAST) := l_value;
+            END IF;
+         END IF;
+      END LOOP;
+
+      RETURN retval;
+   EXCEPTION
+      WHEN OTHERS
+      THEN
+         pl (SQLERRM);
+         pl (l_filter);
+         RETURN NULL;
+   END;
+END anynums_pkg;
+/
+
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/
+

@@ -1,0 +1,180 @@
+DROP TYPE person FORCE;
+
+CREATE TYPE person AS OBJECT(
+   name                          VARCHAR2 (50),
+   dob                           DATE,
+   income                        NUMBER);
+/
+
+DROP TYPE preexisting_conditions FORCE;
+
+CREATE TYPE preexisting_conditions IS TABLE OF VARCHAR2 (25);
+/
+
+CREATE OR REPLACE PACKAGE health$
+AS
+   TYPE refcurtyp IS REF CURSOR;
+
+   PROCEDURE setup_new_hospital (hosp_name IN VARCHAR2);
+
+   PROCEDURE add_profit_source (
+      hosp_name IN VARCHAR2,
+      pers IN person,
+      cond IN preexisting_conditions
+   );
+
+   PROCEDURE weed_out_poor_and_sick (
+      hosp_name VARCHAR2,
+      min_income IN NUMBER := 100000,
+      max_preexist_cond IN INTEGER := 1
+   );
+
+   PROCEDURE show_profit_centers (hosp_name VARCHAR2);
+END health$;
+/
+CREATE OR REPLACE PACKAGE BODY health$
+AS
+   FUNCTION tabname (hosp_name IN VARCHAR2)
+      RETURN VARCHAR2
+   IS
+   BEGIN
+      RETURN hosp_name || '_profit_center';
+   END;
+
+   PROCEDURE setup_new_hospital (hosp_name IN VARCHAR2)
+   IS
+   BEGIN
+      BEGIN
+         EXECUTE IMMEDIATE 'DROP TABLE ' ||
+                              tabname (hosp_name);
+      EXCEPTION
+         WHEN OTHERS
+         THEN
+            NULL;
+      END;
+
+      EXECUTE IMMEDIATE 'CREATE TABLE ' ||
+                           tabname (hosp_name) ||
+                           ' (
+         pers Person, 
+         cond preexisting_conditions)
+         NESTED TABLE cond STORE AS cond_st';
+   END;
+
+   PROCEDURE add_profit_source (
+      hosp_name IN VARCHAR2,
+      pers IN person,
+      cond IN preexisting_conditions
+   )
+   IS
+   BEGIN
+      EXECUTE IMMEDIATE 'INSERT INTO ' ||
+                           tabname (hosp_name) ||
+                           ' VALUES (:revenue_generator, :revenue_inhibitors)'
+         USING pers, cond;
+   END;
+
+   PROCEDURE weed_out_poor_and_sick (
+      hosp_name VARCHAR2,
+      min_income IN NUMBER := 100000,
+      max_preexist_cond IN INTEGER := 1
+   )
+   IS
+      cv refcurtyp;
+      human person;
+      known_bugs preexisting_conditions;
+      v_table VARCHAR2 (30) := tabname (hosp_name);
+      v_rowid ROWID;
+   BEGIN
+      /* Find all rows with more than the specified number
+         of pre-conditions and deny them coverage. */
+      OPEN cv FOR
+         'SELECT ROWID, pers, cond
+            FROM ' ||
+            v_table ||
+            ' alias
+           WHERE (SELECT COUNT(*) FROM TABLE (alias.cond))
+                  > :preexist OR alias.pers.income < :income'
+         USING max_preexist_cond, min_income;
+
+      LOOP
+         FETCH cv INTO v_rowid, human, known_bugs;
+         EXIT WHEN cv%NOTFOUND;
+         EXECUTE IMMEDIATE 'DELETE FROM ' || v_table ||
+                              ' WHERE ROWID = :rid'
+            USING v_rowid;
+      END LOOP;
+
+      CLOSE cv;
+   END;
+
+   PROCEDURE show_profit_centers (hosp_name VARCHAR2)
+   IS
+      cv refcurtyp;
+      human person;
+      known_bugs preexisting_conditions;
+      v_table VARCHAR2 (30) := tabname (hosp_name);
+   BEGIN
+      OPEN cv FOR
+         'SELECT pers, cond FROM ' || v_table;
+
+      LOOP
+         FETCH cv INTO human, known_bugs;
+         EXIT WHEN cv%NOTFOUND;
+
+         IF cv%rowcount = 1
+         THEN
+            DBMS_OUTPUT.put_line (RPAD ('-', 70, '-'));
+            DBMS_OUTPUT.put_line (
+               'Profit Sources for ' || UPPER (hosp_name) ||
+                  ':'
+            );
+            DBMS_OUTPUT.put_line (RPAD ('-', 70, '-'));
+         END IF;
+
+         DBMS_OUTPUT.put_line (
+            human.name || ' earns ' || human.income ||
+               ' and has ' ||
+               known_bugs.COUNT ||
+               ' pre-existing conditions.'
+         );
+      END LOOP;
+
+      CLOSE cv;
+   END;
+END health$;
+/
+
+DECLARE
+   hospital VARCHAR2 (30) := 'chicago';
+   steven person := person ('steven', '23-sep-58', '50000');
+   larry person := person ('larry', '12-jan-49', '50000000');
+   problems preexisting_conditions
+      := preexisting_conditions (
+            'asthma',
+            'allergies',
+            'guilt'
+         );
+   problem_free preexisting_conditions
+                   := preexisting_conditions (
+                         'enlarged ego'
+                      );
+BEGIN
+   health$.setup_new_hospital (hospital);
+   health$.add_profit_source (hospital, steven, problems);
+   health$.add_profit_source (hospital, larry, problem_free);
+   health$.show_profit_centers (hospital);
+   health$.weed_out_poor_and_sick (hospital);
+   health$.show_profit_centers (hospital);
+END;
+/   
+
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

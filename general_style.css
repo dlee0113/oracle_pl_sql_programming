@@ -1,0 +1,63 @@
+H1 {
+	BORDER-RIGHT: black; PADDING-RIGHT: 9px; BORDER-TOP: black; PADDING-LEFT: 9px; MARGIN-BOTTOM: 0px; PADDING-BOTTOM: 9px; BORDER-LEFT: black; COLOR: #ffff99; PADDING-TOP: 0px; BORDER-BOTTOM: black; FONT-FAMILY: "Comic Sans MS", Arial, sans-serif; BACKGROUND-COLOR: #000066
+}
+H1.show_title {
+	BORDER-RIGHT: black; PADDING-RIGHT: 9px; BORDER-TOP: black; PADDING-LEFT: 9px; FONT-SIZE: large; MARGIN-BOTTOM: 0px; PADDING-BOTTOM: 0px; BORDER-LEFT: black; COLOR: #ffff99; PADDING-TOP: 0px; BORDER-BOTTOM: black; FONT-FAMILY: "Comic Sans MS", Arial, sans-serif; BACKGROUND-COLOR: #000066
+}
+H2.slide_title {
+	BORDER-RIGHT: black; PADDING-RIGHT: 9px; BORDER-TOP: black; MARGIN-TOP: 0px; PADDING-LEFT: 9px; FONT-SIZE: medium; MARGIN-BOTTOM: 0px; PADDING-BOTTOM: 9px; BORDER-LEFT: black; COLOR: #ffff99; PADDING-TOP: 0px; BORDER-BOTTOM: black; FONT-FAMILY: "Comic Sans MS", Arial, sans-serif; BACKGROUND-COLOR: #000066
+}
+.linkline {
+	PADDING-RIGHT: 9px; MARGIN-TOP: 0px; PADDING-LEFT: 9px; PADDING-BOTTOM: 3px; COLOR: #990033; PADDING-TOP: 3px; BACKGROUND-COLOR: #ffff99
+}
+B {
+	COLOR: #990033
+}
+H2 {
+	
+}
+A {
+	FONT-WEIGHT: bolder
+}
+.subtitle {
+	MARGIN-TOP: 0px; MARGIN-BOTTOM: 0px; PADDING-BOTTOM: 9px; COLOR: #ffff99; PADDING-TOP: 0px; FONT-STYLE: italic; FONT-FAMILY: "Comic Sans MS", Arial, sans-serif; BACKGROUND-COLOR: #000066
+}
+.sidebarcontent {
+	PADDING-RIGHT: 1em; MARGIN-TOP: 0em; PADDING-LEFT: 1em; MARGIN-BOTTOM: 0em; PADDING-BOTTOM: 0.25em; MARGIN-LEFT: 0em; BORDER-TOP-STYLE: none; PADDING-TOP: 0.25em; BORDER-RIGHT-STYLE: none; BORDER-LEFT-STYLE: none; BACKGROUND-COLOR: #ffff99; BORDER-BOTTOM-STYLE: none
+}
+.sidebarcontentb {
+	PADDING-RIGHT: 1em; MARGIN-TOP: 0em; PADDING-LEFT: 1em; MARGIN-BOTTOM: 0em; PADDING-BOTTOM: 0.25em; MARGIN-LEFT: 0em; BORDER-TOP-STYLE: none; PADDING-TOP: 0.25em; BORDER-RIGHT-STYLE: none; BORDER-LEFT-STYLE: none; BACKGROUND-COLOR: #ffff99; BORDER-BOTTOM-STYLE: none
+}
+.sidebarcontentt {
+	PADDING-RIGHT: 1em; MARGIN-TOP: 0em; PADDING-LEFT: 1em; MARGIN-BOTTOM: 0em; PADDING-BOTTOM: 0.25em; MARGIN-LEFT: 0em; BORDER-TOP-STYLE: none; PADDING-TOP: 0.25em; BORDER-RIGHT-STYLE: none; BORDER-LEFT-STYLE: none; BACKGROUND-COLOR: #ffff99; BORDER-BOTTOM-STYLE: none
+}
+.sidebartitle {
+	FONT-WEIGHT: bold; MARGIN-BOTTOM: 0px; PADDING-BOTTOM: 0em; COLOR: #ffff99; BACKGROUND-COLOR: #000066
+}
+.list_of_links {
+	MARGIN-TOP: 0.3em; MARGIN-BOTTOM: 0.3em; MARGIN-LEFT: 3em
+}
+.slide_description {
+	FONT-SIZE: medium; MARGIN: 0px 0em; COLOR: #ffffff; FONT-FAMILY: "Comic Sans MS", Arial, sans-serif
+}
+.slide_description_v {
+	MARGIN-LEFT: 2em; COLOR: #000000; MARGIN-RIGHT: 2em; BACKGROUND-COLOR: #ffff99
+}
+.slide_simple_description {
+	FONT-WEIGHT: normal; FONT-SIZE: small; MARGIN-LEFT: 0em; COLOR: #ffff99; MARGIN-RIGHT: 0em; FONT-FAMILY: "Comic Sans MS", Arial, sans-serif; TEXT-ALIGN: center
+}
+.slide_title {
+	FONT-WEIGHT: normal; FONT-SIZE: small; COLOR: #000000; FONT-FAMILY: "Comic Sans MS", Arial, sans-serif; TEXT-ALIGN: center
+}
+.slide_linkline {
+	PADDING-RIGHT: 9px; MARGIN-TOP: 0px; PADDING-LEFT: 9px; PADDING-BOTTOM: 3px; COLOR: #990033; PADDING-TOP: 3px; BACKGROUND-COLOR: #ffff99
+}
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

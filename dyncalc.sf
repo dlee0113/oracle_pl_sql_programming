@@ -1,0 +1,62 @@
+CREATE OR REPLACE FUNCTION dyncalc (
+   oper_in IN VARCHAR2,
+   nargs_in IN INTEGER := 0,
+   arg1_in IN VARCHAR2 := NULL,
+   arg2_in IN VARCHAR2 := NULL,
+   arg3_in IN VARCHAR2 := NULL,
+   arg4_in IN VARCHAR2 := NULL,
+   arg5_in IN VARCHAR2 := NULL
+   )
+   RETURN VARCHAR2
+   AUTHID CURRENT_USER
+IS
+   v_code VARCHAR2(32767) := 'BEGIN :outcome := ' || oper_in;
+   retval VARCHAR2(32767);
+BEGIN
+   IF nargs_in = 0
+   THEN
+      EXECUTE IMMEDIATE v_code || '; END;' 
+         USING OUT retval;
+   ELSIF nargs_in = 1
+   THEN
+      EXECUTE IMMEDIATE v_code || '(:1); END;'
+         USING OUT retval, arg1_in;
+   ELSIF nargs_in = 2
+   THEN
+      EXECUTE IMMEDIATE v_code || '(:1, :2); END;'
+         USING OUT retval, arg1_in, arg2_in;
+   ELSIF nargs_in = 3
+   THEN
+      EXECUTE IMMEDIATE v_code || '(:1, :2, :3); END;'
+         USING OUT retval, arg1_in, arg2_in, arg3_in;
+   ELSIF nargs_in = 4
+   THEN
+      EXECUTE IMMEDIATE v_code || '(:1, :2, :3, :4); END;'
+         USING OUT retval, 
+            arg1_in, arg2_in, arg3_in, arg4_in;
+   ELSIF nargs_in = 5
+   THEN
+      EXECUTE IMMEDIATE 
+         v_code || '(:1, :2, :3, :4, :5); END;'
+         USING OUT retval, 
+            arg1_in, arg2_in, arg3_in, arg4_in, arg5_in;   
+   END IF;
+   
+   RETURN retval; 
+EXCEPTION
+   WHEN OTHERS
+	THEN
+	    DBMS_OUTPUT.PUT_LINE (SQLERRM);
+       RETURN NULL;
+END;
+/
+
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

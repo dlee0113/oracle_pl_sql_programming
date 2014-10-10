@@ -1,0 +1,319 @@
+SQL> set autotrace traceonly explain
+SQL> 
+SQL> SELECT *
+  2  FROM   TABLE(pipe_employees) e;
+
+Execution Plan
+----------------------------------------------------------
+Plan hash value: 1802204150
+
+----------------------------------------------------------------------------------------------------
+| Id  | Operation                         | Name           | Rows  | Bytes | Cost (%CPU)| Time     |
+----------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                  |                |  8168 | 16336 |    29   (0)| 00:00:01 |
+|   1 |  COLLECTION ITERATOR PICKLER FETCH| PIPE_EMPLOYEES |       |       |            |          |
+----------------------------------------------------------------------------------------------------
+
+SQL> 
+SQL> SELECT *
+  2  FROM   departments           d
+  3  ,      TABLE(pipe_employees) e
+  4  WHERE  d.department_id = e.department_id;
+
+Execution Plan
+----------------------------------------------------------
+Plan hash value: 3162994763
+
+------------------------------------------------------------------------------------------------------
+| Id  | Operation                           | Name           | Rows  | Bytes | Cost (%CPU)| Time     |
+------------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                    |                |  8168 |   175K|    32   (4)| 00:00:01 |
+|   1 |  MERGE JOIN                         |                |  8168 |   175K|    32   (4)| 00:00:01 |
+|   2 |   TABLE ACCESS BY INDEX ROWID       | DEPARTMENTS    |    27 |   540 |     2   (0)| 00:00:01 |
+|   3 |    INDEX FULL SCAN                  | DEPARTMENTS_PK |    27 |       |     1   (0)| 00:00:01 |
+|*  4 |   SORT JOIN                         |                |  8168 | 16336 |    30   (4)| 00:00:01 |
+|   5 |    COLLECTION ITERATOR PICKLER FETCH| PIPE_EMPLOYEES |       |       |            |          |
+------------------------------------------------------------------------------------------------------
+
+Predicate Information (identified by operation id):
+---------------------------------------------------
+
+   4 - access("D"."DEPARTMENT_ID"=VALUE(KOKBF$))
+       filter("D"."DEPARTMENT_ID"=VALUE(KOKBF$))
+
+SQL> 
+SQL> SELECT /*+ CARDINALITY(e, 50000) */
+  2         *
+  3  FROM   TABLE(pipe_employees) e;
+
+Execution Plan
+----------------------------------------------------------
+Plan hash value: 1802204150
+
+----------------------------------------------------------------------------------------------------
+| Id  | Operation                         | Name           | Rows  | Bytes | Cost (%CPU)| Time     |
+----------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                  |                | 50000 |    97K|    29   (0)| 00:00:01 |
+|   1 |  COLLECTION ITERATOR PICKLER FETCH| PIPE_EMPLOYEES |       |       |            |          |
+----------------------------------------------------------------------------------------------------
+
+SQL> 
+SQL> SELECT /*+ CARDINALITY(e, 50000) */
+  2         *
+  3  FROM   departments           d
+  4  ,      TABLE(pipe_employees) e
+  5  WHERE  d.department_id = e.department_id;
+
+Execution Plan
+----------------------------------------------------------
+Plan hash value: 815920909
+
+-----------------------------------------------------------------------------------------------------
+| Id  | Operation                          | Name           | Rows  | Bytes | Cost (%CPU)| Time     |
+-----------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                   |                | 50000 |  1074K|    33   (4)| 00:00:01 |
+|*  1 |  HASH JOIN                         |                | 50000 |  1074K|    33   (4)| 00:00:01 |
+|   2 |   TABLE ACCESS FULL                | DEPARTMENTS    |    27 |   540 |     3   (0)| 00:00:01 |
+|   3 |   COLLECTION ITERATOR PICKLER FETCH| PIPE_EMPLOYEES |       |       |            |          |
+-----------------------------------------------------------------------------------------------------
+
+Predicate Information (identified by operation id):
+---------------------------------------------------
+
+   1 - access("D"."DEPARTMENT_ID"=VALUE(KOKBF$))
+
+SQL> 
+SQL> SELECT /*+ OPT_ESTIMATE(table, e, scale_rows=6) */
+  2         *
+  3  FROM   TABLE(pipe_employees) e;
+
+Execution Plan
+----------------------------------------------------------
+Plan hash value: 1802204150
+
+----------------------------------------------------------------------------------------------------
+| Id  | Operation                         | Name           | Rows  | Bytes | Cost (%CPU)| Time     |
+----------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                  |                | 49008 | 98016 |    29   (0)| 00:00:01 |
+|   1 |  COLLECTION ITERATOR PICKLER FETCH| PIPE_EMPLOYEES |       |       |            |          |
+----------------------------------------------------------------------------------------------------
+
+SQL> 
+SQL> SELECT /*+ OPT_ESTIMATE(table, e, scale_rows=6) */
+  2         *
+  3  FROM   departments           d
+  4  ,      TABLE(pipe_employees) e
+  5  WHERE  d.department_id = e.department_id;
+
+Execution Plan
+----------------------------------------------------------
+Plan hash value: 815920909
+
+-----------------------------------------------------------------------------------------------------
+| Id  | Operation                          | Name           | Rows  | Bytes | Cost (%CPU)| Time     |
+-----------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                   |                | 49008 |  1052K|    33   (4)| 00:00:01 |
+|*  1 |  HASH JOIN                         |                | 49008 |  1052K|    33   (4)| 00:00:01 |
+|   2 |   TABLE ACCESS FULL                | DEPARTMENTS    |    27 |   540 |     3   (0)| 00:00:01 |
+|   3 |   COLLECTION ITERATOR PICKLER FETCH| PIPE_EMPLOYEES |       |       |            |          |
+-----------------------------------------------------------------------------------------------------
+
+Predicate Information (identified by operation id):
+---------------------------------------------------
+
+   1 - access("D"."DEPARTMENT_ID"=VALUE(KOKBF$))
+
+SQL> 
+SQL> SELECT /*+ DYNAMIC_SAMPLING(e 5) */
+  2         *
+  3  FROM   TABLE(pipe_employees) e;
+
+Execution Plan
+----------------------------------------------------------
+Plan hash value: 1802204150
+
+----------------------------------------------------------------------------------------------------
+| Id  | Operation                         | Name           | Rows  | Bytes | Cost (%CPU)| Time     |
+----------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                  |                | 50000 |    97K|    11   (0)| 00:00:01 |
+|   1 |  COLLECTION ITERATOR PICKLER FETCH| PIPE_EMPLOYEES |       |       |            |          |
+----------------------------------------------------------------------------------------------------
+
+Note
+-----
+   - dynamic sampling used for this statement
+
+SQL> 
+SQL> SELECT /*+ DYNAMIC_SAMPLING(e 5) */
+  2         *
+  3  FROM   departments           d
+  4  ,      TABLE(pipe_employees) e
+  5  WHERE  d.department_id = e.department_id;
+
+Execution Plan
+----------------------------------------------------------
+Plan hash value: 815920909
+
+-----------------------------------------------------------------------------------------------------
+| Id  | Operation                          | Name           | Rows  | Bytes | Cost (%CPU)| Time     |
+-----------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                   |                | 50000 |  1074K|    15   (7)| 00:00:01 |
+|*  1 |  HASH JOIN                         |                | 50000 |  1074K|    15   (7)| 00:00:01 |
+|   2 |   TABLE ACCESS FULL                | DEPARTMENTS    |    27 |   540 |     3   (0)| 00:00:01 |
+|   3 |   COLLECTION ITERATOR PICKLER FETCH| PIPE_EMPLOYEES |       |       |            |          |
+-----------------------------------------------------------------------------------------------------
+
+Predicate Information (identified by operation id):
+---------------------------------------------------
+
+   1 - access("D"."DEPARTMENT_ID"=VALUE(KOKBF$))
+
+Note
+-----
+   - dynamic sampling used for this statement
+
+SQL> 
+SQL> SELECT /*+ LEADING(d) USE_HASH(e) */
+  2         *
+  3  FROM   departments           d
+  4  ,      TABLE(pipe_employees) e
+  5  WHERE  d.department_id = e.department_id;
+
+Execution Plan
+----------------------------------------------------------
+Plan hash value: 815920909
+
+-----------------------------------------------------------------------------------------------------
+| Id  | Operation                          | Name           | Rows  | Bytes | Cost (%CPU)| Time     |
+-----------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                   |                |  8168 |   175K|    33   (4)| 00:00:01 |
+|*  1 |  HASH JOIN                         |                |  8168 |   175K|    33   (4)| 00:00:01 |
+|   2 |   TABLE ACCESS FULL                | DEPARTMENTS    |    27 |   540 |     3   (0)| 00:00:01 |
+|   3 |   COLLECTION ITERATOR PICKLER FETCH| PIPE_EMPLOYEES |       |       |            |          |
+-----------------------------------------------------------------------------------------------------
+
+Predicate Information (identified by operation id):
+---------------------------------------------------
+
+   1 - access("D"."DEPARTMENT_ID"=VALUE(KOKBF$))
+
+SQL> 
+SQL> ASSOCIATE STATISTICS WITH FUNCTIONS pipe_employees USING pipelined_stats_ot;
+
+Statistics associated.
+
+SQL> 
+SQL> SELECT *
+  2  FROM   departments                  d
+  3  ,      TABLE(pipe_employees(50000)) e
+  4  WHERE  d.department_id = e.department_id;
+
+Execution Plan
+----------------------------------------------------------
+Plan hash value: 815920909
+
+-----------------------------------------------------------------------------------------------------
+| Id  | Operation                          | Name           | Rows  | Bytes | Cost (%CPU)| Time     |
+-----------------------------------------------------------------------------------------------------
+|   0 | SELECT STATEMENT                   |                | 50000 |  1074K|    33   (4)| 00:00:01 |
+|*  1 |  HASH JOIN                         |                | 50000 |  1074K|    33   (4)| 00:00:01 |
+|   2 |   TABLE ACCESS FULL                | DEPARTMENTS    |    27 |   540 |     3   (0)| 00:00:01 |
+|   3 |   COLLECTION ITERATOR PICKLER FETCH| PIPE_EMPLOYEES |       |       |            |          |
+-----------------------------------------------------------------------------------------------------
+
+Predicate Information (identified by operation id):
+---------------------------------------------------
+
+   1 - access("D"."DEPARTMENT_ID"=VALUE(KOKBF$))
+
+SQL> 
+SQL> DISASSOCIATE STATISTICS FROM FUNCTIONS pipe_employees;
+
+Statistics disassociated.
+
+SQL> 
+SQL> set autotrace off
+SQL> 
+SQL> DECLARE
+  2     v_task      VARCHAR2(30);
+  3     v_task_name VARCHAR2(30) := 'cbo_test';
+  4     v_sql       CLOB;
+  5  BEGIN
+  6  
+  7     /* SQL to be tuned... */
+  8     v_sql := 'SELECT *
+  9               FROM   departments           d
+ 10               ,      TABLE(pipe_employees) e
+ 11               WHERE  d.department_id = e.department_id';
+ 12  
+ 13     /* Create a SQL Tuning task for our SQL... */
+ 14     v_task := DBMS_SQLTUNE.CREATE_TUNING_TASK(
+ 15                  sql_text    => v_sql,
+ 16                  time_limit  => 10,
+ 17                  scope       => 'COMPREHENSIVE',
+ 18                  task_name   => v_task_name,
+ 19                  description => 'Tuning pipelined function plans'
+ 20                  );
+ 21  
+ 22     /* Execute the task... */
+ 23     DBMS_SQLTUNE.EXECUTE_TUNING_TASK(
+ 24        task_name => v_task_name
+ 25        );
+ 26  
+ 27  END;
+ 28  /
+
+PL/SQL procedure successfully completed.
+
+SQL> 
+SQL> set long 80000
+SQL> col recs format a140
+SQL> 
+SQL> SELECT DBMS_SQLTUNE.REPORT_TUNING_TASK('cbo_test') AS recs
+  2  FROM   dual;
+
+RECS
+--------------------------------------------------------------------------------------------------------------------------------------------
+GENERAL INFORMATION SECTION
+-------------------------------------------------------------------------------
+Tuning Task Name   : cbo_test
+Tuning Task Owner  : BOOK
+Workload Type      : Single SQL Statement
+Scope              : COMPREHENSIVE
+Time Limit(seconds): 10
+Completion Status  : COMPLETED
+Started at         : 03/18/2009 00:51:05
+Completed at       : 03/18/2009 00:51:06
+
+-------------------------------------------------------------------------------
+Schema Name: BOOK
+SQL ID     : 01rhgax0jtucx
+SQL Text   : SELECT *
+                          FROM   departments           d
+                          ,      TABLE(pipe_employees) e
+                          WHERE  d.department_id = e.department_id
+
+-------------------------------------------------------------------------------
+There are no recommendations to improve the statement.
+
+-------------------------------------------------------------------------------
+
+
+1 row selected.
+
+SQL> 
+SQL> exec DBMS_SQLTUNE.DROP_TUNING_TASK('cbo_test');
+
+PL/SQL procedure successfully completed.
+
+SQL> 
+SQL> set echo off
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

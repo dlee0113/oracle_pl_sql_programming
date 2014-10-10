@@ -1,0 +1,90 @@
+CREATE OR REPLACE PACKAGE dbparm
+IS
+   /* Generic (by datatype) interfaces to built-in. */
+   FUNCTION strval (nm IN VARCHAR2) RETURN VARCHAR2;
+   FUNCTION intval (nm IN VARCHAR2) RETURN INTEGER;
+   FUNCTION boolval (nm IN VARCHAR2) RETURN BOOLEAN;
+
+   /* Encapsulation for specific parameter retrieval */
+   FUNCTION nls_date_format RETURN VARCHAR2;
+   FUNCTION utl_file_dir RETURN VARCHAR2;
+   FUNCTION db_block_buffers RETURN INTEGER;
+
+   PROCEDURE showval (nm IN VARCHAR2);
+END;
+/
+CREATE OR REPLACE PACKAGE BODY dbparm
+IS
+   FUNCTION nls_date_format RETURN VARCHAR2
+   IS
+   BEGIN
+      RETURN strval ('nls_date_format');
+   END;
+
+   FUNCTION utl_file_dir RETURN VARCHAR2
+   IS
+   BEGIN
+      RETURN strval ('utl_file_dir');
+   END;
+
+   FUNCTION db_block_buffers RETURN INTEGER
+   IS
+   BEGIN
+      RETURN intval ('db_block_buffers');
+   END;
+
+   FUNCTION strval (nm IN VARCHAR2) RETURN VARCHAR2
+   IS
+      valtype PLS_INTEGER;
+      ival PLS_INTEGER;
+      sval VARCHAR2(2000);
+   BEGIN
+      valtype := DBMS_UTILITY.GET_PARAMETER_VALUE (nm, ival, sval);
+      RETURN sval;
+   END;
+
+   FUNCTION intval (nm IN VARCHAR2) RETURN INTEGER
+   IS
+      valtype PLS_INTEGER;
+      ival PLS_INTEGER;
+      sval VARCHAR2(2000);
+   BEGIN
+      valtype := DBMS_UTILITY.GET_PARAMETER_VALUE (nm, ival, sval);
+      RETURN ival;
+   END;
+
+   FUNCTION boolval (nm IN VARCHAR2) RETURN BOOLEAN
+   IS
+      valtype PLS_INTEGER;
+      ival PLS_INTEGER;
+      sval VARCHAR2(2000);
+   BEGIN
+      valtype := DBMS_UTILITY.GET_PARAMETER_VALUE (nm, ival, sval);
+      RETURN ival = 1;
+   END;
+
+   PROCEDURE showval (nm IN VARCHAR2)
+   IS
+      valtype PLS_INTEGER;
+      ival PLS_INTEGER;
+      sval VARCHAR2(2000);
+   BEGIN
+      valtype := DBMS_UTILITY.GET_PARAMETER_VALUE (nm, ival, sval);
+      DBMS_OUTPUT.PUT_LINE ('Init.Ora Values for ' || nm);
+      DBMS_OUTPUT.PUT_LINE ('Value type: ' || valtype);
+      DBMS_OUTPUT.PUT_LINE ('Integer value: ' || ival);
+      DBMS_OUTPUT.PUT_LINE ('String value: ' || sval);
+   END;
+
+END;
+/
+
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

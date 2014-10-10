@@ -1,0 +1,92 @@
+CREATE OR REPLACE FUNCTION date_range 
+	(start_date_in IN DATE, 
+	 end_date_in IN DATE,
+	 check_time_in IN VARCHAR2 := 'NOTIME')
+RETURN VARCHAR2
+/*
+|| date_range returns a string containing a date range
+|| in the format 'BETWEEN x AND y'
+||
+|| Parameters:
+||		start_date_in - The start date of the range. If NULL
+||			then use the min_start_date. If that is NULL, range 
+||			has form '<= end_date'.
+||
+||		end_date_in - The end date of the range. If NULL
+||			then use the max_end_date. If that is NULL, range has 
+||			form '>= start_date'.
+||
+||		check_time_in - If 'TIME' then use the time component
+||			of the dates as part of the comparison.
+||			If 'NOTIME' then strip off the time.
+*/
+IS
+	/* String versions of parameters to place in return value */
+	start_date_int VARCHAR2(30);
+	end_date_int VARCHAR2(30);
+
+	/* Date mask for date<->character conversions. */
+	mask_int VARCHAR2(15) := 'MMDDYYYY';
+
+	/* Version of date mask which fits right into date range string */
+	mask_string VARCHAR2(30) := NULL;
+
+	/* The return value for the function. */
+   return_value VARCHAR2(1000) := NULL;
+BEGIN
+	/*
+	|| Finalize the date mask. If user wants to use time, add that to
+	|| the mask. Then set the string version by embedding the mask
+	|| in single quotes and with a trailing paranthesis.
+	*/
+	IF UPPER (check_time_in) = 'TIME'
+	THEN 
+		mask_int := mask_int || ' HHMISS';
+	END IF;
+	/*
+	|| Convert mask. Example: 
+	|| 		If mask is:				MMDDYYYY HHMISS
+	|| 		then mask string is: ', 'MMDDYYYY HHMISS')
+	*/
+	mask_string := ''', ''' || mask_int || ''')';
+
+	/* Now convert the dates to character strings using format mask */
+   start_date_int := TO_CHAR (start_date_in, mask_int);
+	end_date_int := TO_CHAR (end_date_in, mask_int);
+
+	/* If both start and end are NULL, then return NULL. */
+	IF start_date_int IS NULL AND end_date_int IS NULL 
+	THEN
+		return_value := NULL;
+
+	/* If no start point then return "<=" format. */
+	ELSIF start_date_int IS NULL
+	THEN
+		return_value := '<= TO_DATE (''' || end_date_int || mask_string;
+
+	/* If no end point then return ">=" format. */
+	ELSIF end_date_int IS NULL
+	THEN
+		return_value := '>= TO_DATE (''' || start_date_int || mask_string;
+
+	/* Have start and end. A true range, so just put it together. */
+	ELSE
+		return_value :=
+		  'BETWEEN TO_DATE (''' || start_date_int || mask_string || 
+		     ' AND TO_DATE (''' || end_date_int || mask_string; 
+	END IF;
+
+	RETURN return_value;
+
+END;
+/
+
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

@@ -1,0 +1,24 @@
+REM $Id: books.tab,v 1.1 2001/11/30 23:09:48 bill Exp $
+REM From "Learning Oracle PL/SQL" page 64
+
+REM Create "books" table
+
+CREATE TABLE books (
+   isbn VARCHAR2(13) NOT NULL PRIMARY KEY,
+   title VARCHAR2(200),
+   summary VARCHAR2(2000),
+   author VARCHAR2(200),
+   date_published DATE,
+   page_count NUMBER
+);
+
+
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

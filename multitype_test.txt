@@ -1,0 +1,305 @@
+SQL> col object_instance format a75
+SQL> col record_type format a11
+SQL> col cust_rec format a30
+SQL> col addr_rec format a30
+SQL> col first_name format a10
+SQL> col last_name format a10
+SQL> col birth_date format a10
+SQL> col street_address format a25
+SQL> col postal_code format a11
+SQL> 
+SQL> ALTER SESSION SET NLS_DATE_FORMAT = 'DD/MM/YYYY';
+
+Session altered.
+
+SQL> 
+SQL> SELECT *
+  2  FROM   TABLE(
+  3            customer_pkg.customer_transform_multi(
+  4               CURSOR( SELECT * FROM customer_staging ) ) ) nt
+  5  WHERE  ROWNUM <= 5;
+
+CUSTOMER_ID
+-----------
+          1
+          1
+          1
+          1
+          2
+
+5 rows selected.
+
+SQL> 
+SQL> SELECT VALUE(nt) AS object_instance
+  2  FROM   TABLE(
+  3            customer_pkg.customer_transform_multi(
+  4               CURSOR( SELECT * FROM customer_staging ) ) ) nt
+  5  WHERE  ROWNUM <= 5;
+
+OBJECT_INSTANCE(CUSTOMER_ID)
+---------------------------------------------------------------------------
+CUSTOMER_DETAIL_OT(1, 'Abigail', 'Kessel', '31/03/1949')
+ADDRESS_DETAIL_OT(1, 12135, 'N', '37 North Coshocton Street', '78247')
+ADDRESS_DETAIL_OT(1, 12136, 'N', '47 East Sagadahoc Road', '90285')
+ADDRESS_DETAIL_OT(1, 12156, 'Y', '7 South 3rd Circle', '30828')
+CUSTOMER_DETAIL_OT(2, 'Anne', 'KOCH', '23/09/1949')
+
+5 rows selected.
+
+SQL> 
+SQL> SELECT nt.OBJECT_VALUE AS object_instance
+  2  FROM   TABLE(
+  3            customer_pkg.customer_transform_multi(
+  4               CURSOR( SELECT * FROM customer_staging ) ) ) nt
+  5  WHERE  ROWNUM <= 5;
+
+OBJECT_INSTANCE(CUSTOMER_ID)
+---------------------------------------------------------------------------
+CUSTOMER_DETAIL_OT(1, 'Abigail', 'Kessel', '31/03/1949')
+ADDRESS_DETAIL_OT(1, 12135, 'N', '37 North Coshocton Street', '78247')
+ADDRESS_DETAIL_OT(1, 12136, 'N', '47 East Sagadahoc Road', '90285')
+ADDRESS_DETAIL_OT(1, 12156, 'Y', '7 South 3rd Circle', '30828')
+CUSTOMER_DETAIL_OT(2, 'Anne', 'KOCH', '23/09/1949')
+
+5 rows selected.
+
+SQL> 
+SQL> SELECT CASE
+  2            WHEN VALUE(nt) IS OF TYPE (customer_detail_ot)
+  3            THEN 'C'
+  4            ELSE 'A'
+  5         END AS record_type
+  6  FROM   TABLE(
+  7            customer_pkg.customer_transform_multi(
+  8               CURSOR( SELECT * FROM customer_staging ) ) ) nt
+  9  WHERE  ROWNUM <= 5;
+
+RECORD_TYPE
+-----------
+C
+A
+A
+A
+C
+
+5 rows selected.
+
+SQL> 
+SQL> SELECT CASE
+  2            WHEN VALUE(nt) IS OF TYPE (customer_detail_ot)
+  3            THEN 'C'
+  4            ELSE 'A'
+  5         END                                    AS record_type
+  6  ,      TREAT(VALUE(nt) AS customer_detail_ot) AS cust_rec
+  7  ,      TREAT(VALUE(nt) AS address_detail_ot)  AS addr_rec
+  8  FROM   TABLE(
+  9            customer_pkg.customer_transform_multi(
+ 10               CURSOR( SELECT * FROM customer_staging ) ) ) nt
+ 11  WHERE  ROWNUM <= 5;
+
+RECORD_TYPE CUST_REC(CUSTOMER_ID, FIRST_NA ADDR_REC(CUSTOMER_ID, ADDRESS_
+----------- ------------------------------ ------------------------------
+C           CUSTOMER_DETAIL_OT(1, 'Abigail
+            ', 'Kessel', '31/03/1949')
+
+A                                          ADDRESS_DETAIL_OT(1, 12135, 'N
+                                           ', '37 North Coshocton Street'
+                                           , '78247')
+
+A                                          ADDRESS_DETAIL_OT(1, 12136, 'N
+                                           ', '47 East Sagadahoc Road', '
+                                           90285')
+
+A                                          ADDRESS_DETAIL_OT(1, 12156, 'Y
+                                           ', '7 South 3rd Circle', '3082
+                                           8')
+
+C           CUSTOMER_DETAIL_OT(2, 'Anne',
+            'KOCH', '23/09/1949')
+
+
+5 rows selected.
+
+SQL> 
+SQL> SELECT ilv.record_type
+  2  ,      NVL(ilv.cust_rec.customer_id,
+  3             ilv.addr_rec.customer_id) AS customer_id
+  4  ,      ilv.cust_rec.first_name       AS first_name
+  5  ,      ilv.cust_rec.last_name        AS last_name
+  6  ,      ilv.cust_rec.birth_date       AS birth_date
+  7  ,      ilv.addr_rec.address_id       AS address_id
+  8  ,      ilv.addr_rec.primary          AS primary
+  9  ,      ilv.addr_rec.street_address   AS street_address
+ 10  ,      ilv.addr_rec.postal_code      AS postal_code
+ 11  FROM  (
+ 12         SELECT CASE
+ 13                   WHEN VALUE(nt) IS OF TYPE (customer_detail_ot)
+ 14                   THEN 'C'
+ 15                   ELSE 'A'
+ 16                END                                    AS record_type
+ 17         ,      TREAT(VALUE(nt) AS customer_detail_ot) AS cust_rec
+ 18         ,      TREAT(VALUE(nt) AS address_detail_ot)  AS addr_rec
+ 19         FROM   TABLE(
+ 20                   customer_pkg.customer_transform_multi(
+ 21                      CURSOR( SELECT * FROM customer_staging ) ) ) nt
+ 22        ) ilv
+ 23  WHERE  ROWNUM <= 5;
+
+RECORD_TYPE CUSTOMER_ID FIRST_NAME LAST_NAME  BIRTH_DATE ADDRESS_ID P STREET_ADDRESS            POSTAL_CODE
+----------- ----------- ---------- ---------- ---------- ---------- - ------------------------- -----------
+C                     1 Abigail    Kessel     31/03/1949
+A                     1                                       12135 N 37 North Coshocton Street 78247
+A                     1                                       12136 N 47 East Sagadahoc Road    90285
+A                     1                                       12156 Y 7 South 3rd Circle        30828
+C                     2 Anne       KOCH       23/09/1949
+
+5 rows selected.
+
+SQL> 
+SQL> ALTER SESSION SET NLS_DATE_FORMAT = 'DD/MM/YYYY HH24:MI:SS';
+
+Session altered.
+
+SQL> 
+SQL> set echo off
+
+5602 rows selected.
+
+Elapsed: 00:00:00.21
+
+Statistics
+----------------------------------------------------------
+        161  recursive calls
+          0  db block gets
+        167  consistent gets
+          0  physical reads
+          0  redo size
+     677200  bytes sent via SQL*Net to client
+        537  bytes received via SQL*Net from client
+         13  SQL*Net roundtrips to/from client
+          1  sorts (memory)
+          0  sorts (disk)
+       5602  rows processed
+
+
+21203 rows selected.
+
+Elapsed: 00:00:00.93
+
+Statistics
+----------------------------------------------------------
+        161  recursive calls
+          0  db block gets
+        167  consistent gets
+          0  physical reads
+          0  redo size
+     835598  bytes sent via SQL*Net to client
+        878  bytes received via SQL*Net from client
+         44  SQL*Net roundtrips to/from client
+          1  sorts (memory)
+          0  sorts (disk)
+      21203  rows processed
+
+
+Table truncated.
+
+Elapsed: 00:00:00.07
+
+Table truncated.
+
+Elapsed: 00:00:00.03
+SQL> exec runstats_pkg.rs_start;
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.29
+SQL> exec customer_pkg.load_customers_denorm;
+21203 rows inserted.
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.37
+SQL> exec runstats_pkg.rs_pause;
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.03
+SQL> TRUNCATE TABLE customers;
+
+Table truncated.
+
+Elapsed: 00:00:00.03
+SQL> TRUNCATE TABLE addresses;
+
+Table truncated.
+
+Elapsed: 00:00:00.10
+SQL> exec runstats_pkg.rs_resume;
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.03
+SQL> exec customer_pkg.load_customers_multi;
+21203 rows inserted.
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:01.07
+SQL> exec runstats_pkg.rs_stop(1000);
+================================================================================
+Runstats report : 21-JAN-2009 17:41:59
+================================================================================
+
+
+--------------------------------------------------------------------------------
+1. Summary timings
+--------------------------------------------------------------------------------
+Run1 ran in 41 hsecs
+Run2 ran in 109 hsecs
+Run1 was 62.4% quicker than Run2
+
+
+--------------------------------------------------------------------------------
+2. Statistics report
+--------------------------------------------------------------------------------
+
+
+Type  Name                                        Run1         Run2         Diff
+----- ----------------------------------- ------------ ------------ ------------
+STAT  undo change vector size                1,039,764    1,049,408        9,644
+STAT  redo size                              3,535,984    3,560,140       24,156
+LATCH kokc descriptor allocation latch               2       42,414       42,412
+LATCH shared pool simulator                        194       58,172       57,978
+LATCH shared pool                                  177       84,991       84,814
+STAT  session uga memory                       458,248      327,320     -130,928
+STAT  session pga memory max                   327,680      196,608     -131,072
+LATCH row cache objects                          1,077      382,683      381,606
+STAT  session pga memory                      -786,432      327,680    1,114,112
+
+
+--------------------------------------------------------------------------------
+3. Latching report
+--------------------------------------------------------------------------------
+Run1 used 59,670 latches
+Run2 used 626,769 latches
+Run1 used 90.5% fewer latches than Run2
+
+
+================================================================================
+End of report
+================================================================================
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.03
+SQL> set echo off
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/
+

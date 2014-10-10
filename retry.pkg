@@ -1,0 +1,213 @@
+REM DROP TABLE retry_counter;
+
+CREATE TABLE retry_counter (
+   username VARCHAR2(30),
+   item VARCHAR2(100),
+   last_attempt DATE,
+   tries INTEGER
+   );
+
+ALTER TABLE retry_counter ADD CONSTRAINT retry_pk
+   PRIMARY KEY (username, item);
+
+CREATE OR REPLACE PACKAGE retry
+IS       
+   /* Use with DBMS_LOCK version
+   FUNCTION got_it (item IN VARCHAR2)
+      RETURN BOOLEAN;
+   */
+   PROCEDURE incr_attempts (item IN VARCHAR2);
+   
+   PROCEDURE set_limit (
+      item IN VARCHAR2,
+      limit IN INTEGER);
+   
+   FUNCTION limit (item IN VARCHAR2)
+      RETURN INTEGER; 
+
+   FUNCTION limit_reached (item IN VARCHAR2)
+      RETURN BOOLEAN; 
+       
+   PROCEDURE clear_attempts (item IN VARCHAR2);
+   
+   FUNCTION attempts (item IN VARCHAR2)
+      RETURN INTEGER; 
+       
+   FUNCTION attempts_left (item IN VARCHAR2)
+      RETURN INTEGER; 
+       
+   FUNCTION attempted_at (item IN VARCHAR2)
+      RETURN DATE; 
+       
+   PROCEDURE show_retries (item IN VARCHAR2 := '%');
+END retry;
+/
+
+CREATE OR REPLACE PACKAGE BODY retry
+IS       
+   PROCEDURE incr_attempts (
+      item IN VARCHAR2,
+      incr IN INTEGER,
+      username IN VARCHAR2)
+   IS
+      PRAGMA AUTONOMOUS_TRANSACTION;
+      
+      v_user VARCHAR2(30) := NVL (UPPER (username), USER);
+   BEGIN
+      INSERT INTO retry_counter VALUES (
+         v_user, incr_attempts.item, SYSDATE, incr);
+      COMMIT;
+   EXCEPTION
+      WHEN DUP_VAL_ON_INDEX
+      THEN
+         UPDATE retry_counter
+            SET last_attempt = SYSDATE,
+                tries = DECODE (incr_attempts.username, '*', incr, tries + incr)
+          WHERE username = v_user 
+            AND item = incr_attempts.item;
+         COMMIT;
+            
+      WHEN OTHERS THEN ROLLBACK; RAISE;
+   END;
+   
+   PROCEDURE incr_attempts (item IN VARCHAR2)
+   IS
+   BEGIN
+      incr_attempts (item, 1, USER);
+   END;
+
+   PROCEDURE set_limit (
+      item IN VARCHAR2,
+      limit IN INTEGER)
+   IS
+   BEGIN
+      incr_attempts (item, limit, '*');
+   END;
+   
+   FUNCTION attempts (item IN VARCHAR2, username IN VARCHAR2)
+      RETURN INTEGER 
+   IS
+      retval INTEGER;
+   BEGIN
+      SELECT tries INTO retval
+        FROM retry_counter
+       WHERE username = attempts.username 
+         AND item = attempts.item;
+      RETURN retval;
+   EXCEPTION WHEN NO_DATA_FOUND THEN RETURN NULL;
+   END;
+       
+   FUNCTION attempts (item IN VARCHAR2)
+      RETURN INTEGER 
+   IS
+   BEGIN
+      RETURN attempts (item, USER);
+   END;
+
+   FUNCTION limit (item IN VARCHAR2)
+      RETURN INTEGER 
+   IS
+   BEGIN
+      RETURN attempts (item, '*');
+   END;
+
+   PROCEDURE clear_attempts (item IN VARCHAR2)
+   IS
+      PRAGMA AUTONOMOUS_TRANSACTION;
+   BEGIN
+      UPDATE retry_counter
+         SET last_attempt = NULL,
+             tries = 0
+       WHERE username = USER 
+         AND item = clear_attempts.item;
+      COMMIT;
+   EXCEPTION         
+      WHEN OTHERS THEN ROLLBACK; RAISE;
+   END;
+   
+   FUNCTION limit_reached (item IN VARCHAR2)
+      RETURN BOOLEAN
+   IS
+   BEGIN
+      RETURN limit (item) <= attempts (item);
+   END; 
+       
+   FUNCTION attempts_left (item IN VARCHAR2)
+      RETURN INTEGER
+   IS
+   BEGIN
+      RETURN GREATEST (0, limit (item) - attempts (item));
+   END; 
+       
+   FUNCTION attempted_at (item IN VARCHAR2)
+      RETURN DATE 
+   IS
+      retval DATE;
+   BEGIN
+      SELECT last_attempt INTO retval
+        FROM retry_counter
+       WHERE username = USER 
+         AND item = attempted_at.item;
+      RETURN retval;
+   EXCEPTION WHEN NO_DATA_FOUND THEN RETURN NULL;
+   END;
+
+   PROCEDURE show_retries (item IN VARCHAR2 := '%')
+   IS
+      CURSOR limit_cur IS
+         SELECT * FROM retry_counter
+          WHERE username = '*' 
+            AND item LIKE show_retries.item
+          ORDER BY item; 
+          
+      CURSOR items_cur (item IN VARCHAR2) 
+      IS
+         SELECT * FROM retry_counter
+          WHERE item = items_cur.item
+            AND username != '*'
+          ORDER BY USER; 
+   BEGIN
+      FOR limits IN limit_cur
+      LOOP
+         IF limit_cur%ROWCOUNT > 1
+         THEN
+            DBMS_OUTPUT.NEW_LINE;
+         END IF;
+         
+         DBMS_OUTPUT.PUT_LINE (
+            'Resource "' || limits.item || 
+            '" with up to ' || limits.tries || ' Attempts');
+         DBMS_OUTPUT.PUT_LINE (RPAD ('-', 60, '-'));
+         DBMS_OUTPUT.PUT_LINE (
+            'Username            Attempts  Last Attempt');
+         DBMS_OUTPUT.PUT_LINE (RPAD ('-', 60, '-'));
+         
+         FOR items IN items_cur (limits.item)
+         LOOP
+            DBMS_OUTPUT.PUT_LINE (
+               RPAD (items.username, 20) ||
+               RPAD (items.tries, 10) ||
+               TO_CHAR (items.last_attempt, 
+                  'MM/DD/YYYY HH24:MI:SS')
+               );
+         END LOOP;
+      END LOOP;
+      
+   END;
+      
+END retry;
+/
+
+
+
+
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/
+

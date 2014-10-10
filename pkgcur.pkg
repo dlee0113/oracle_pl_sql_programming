@@ -1,0 +1,61 @@
+CREATE OR REPLACE PACKAGE personnel
+IS
+   CURSOR emps_for_dept (
+      deptno_in IN emp.deptno%TYPE)
+   IS
+      SELECT * FROM emp 
+       WHERE deptno = deptno_in;
+
+   PROCEDURE open_emps_for_dept(
+      deptno_in IN emp.deptno%TYPE,
+      close_if_open IN BOOLEAN := TRUE
+      );
+
+   PROCEDURE close_emps_for_dept;
+   
+END personnel;
+/
+CREATE OR REPLACE PACKAGE BODY personnel
+IS
+   PROCEDURE open_emps_for_dept (
+      deptno_in IN emp.deptno%TYPE,
+      close_if_open IN BOOLEAN := TRUE
+      )
+   IS
+      v_close BOOLEAN := NVL (close_if_open, TRUE);
+      v_open BOOLEAN := TRUE;
+   BEGIN
+      IF emps_for_dept%ISOPEN AND v_close
+      THEN
+         CLOSE emps_for_dept;
+
+      ELSIF emps_for_dept%ISOPEN AND NOT v_close
+      THEN
+         v_open := FALSE;
+      END IF;
+
+      IF v_open THEN
+         OPEN emps_for_dept (deptno_in);
+      END IF;
+   END;
+
+   PROCEDURE close_emps_for_dept 
+   IS
+   BEGIN
+      IF emps_for_dept%ISOPEN
+      THEN
+         CLOSE emps_for_dept;
+      END IF;
+   END;
+END personnel;
+/
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/
+

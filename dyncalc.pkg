@@ -1,0 +1,120 @@
+CREATE OR REPLACE PACKAGE dyn
+IS
+   /* TVP 5/99 Suggestion: */
+   TYPE args_tabtype IS TABLE OF VARCHAR2(2000) 
+      INDEX BY BINARY_INTEGER;
+   
+   FUNCTION calc (
+      oper_in IN VARCHAR2,
+      args IN args_tabtype)
+   RETURN VARCHAR2;
+   
+   FUNCTION calc (
+      oper_in IN VARCHAR2,
+      nargs_in IN PLS_INTEGER := 0,
+      arg1_in IN VARCHAR2 := NULL,
+      arg2_in IN VARCHAR2 := NULL,
+      arg3_in IN VARCHAR2 := NULL,
+      arg4_in IN VARCHAR2 := NULL,
+      arg5_in IN VARCHAR2 := NULL,
+      arg6_in IN VARCHAR2 := NULL,
+      arg7_in IN VARCHAR2 := NULL,
+      arg8_in IN VARCHAR2 := NULL,
+      arg9_in IN VARCHAR2 := NULL,
+      arg10_in IN VARCHAR2 := NULL
+      )
+   RETURN VARCHAR2;
+END;
+/
+   
+CREATE OR REPLACE PACKAGE BODY dyn
+IS
+   FUNCTION valfromstr (str IN VARCHAR2) RETURN VARCHAR2
+   IS
+      retval PLV.maxvc2;
+   BEGIN
+      EXECUTE IMMEDIATE str
+         USING IN OUT retval;
+
+      RETURN retval; 
+   EXCEPTION
+      WHEN OTHERS
+   	  THEN
+   	      do.pl /* do.pkg */ (SQLERRM);
+          do.pl /* do.pkg */ (str);
+          RETURN NULL;
+   END;
+   
+   FUNCTION calc (
+      oper_in IN VARCHAR2,
+      args IN args_tabtype)
+   RETURN VARCHAR2
+   IS
+      v_code PLV.maxvc2 := 'BEGIN :outcome := ' || oper_in;
+      indx PLS_INTEGER := args.FIRST;
+   BEGIN
+      do.pl /* do.pkg */ (v_code);
+      IF indx IS NOT NULL
+      THEN
+         v_code := v_code || '(';
+         
+         LOOP
+            EXIT WHEN indx IS NULL;
+            v_code := v_code || NVL (args(indx), 'NULL') || ',';
+            indx := args.NEXT (indx);
+         END LOOP;
+
+         v_code := RTRIM (v_code, ',') || ')'; 
+         
+         do.pl /* do.pkg */ (v_code);
+      END IF;
+      
+      v_code := v_code || '; END;';
+
+      do.pl /* do.pkg */ (v_code);
+      
+      RETURN valfromstr (v_code);
+   END;
+
+   FUNCTION calc (
+      oper_in IN VARCHAR2,
+      nargs_in IN PLS_INTEGER := 0,
+      arg1_in IN VARCHAR2 := NULL,
+      arg2_in IN VARCHAR2 := NULL,
+      arg3_in IN VARCHAR2 := NULL,
+      arg4_in IN VARCHAR2 := NULL,
+      arg5_in IN VARCHAR2 := NULL,
+      arg6_in IN VARCHAR2 := NULL,
+      arg7_in IN VARCHAR2 := NULL,
+      arg8_in IN VARCHAR2 := NULL,
+      arg9_in IN VARCHAR2 := NULL,
+      arg10_in IN VARCHAR2 := NULL
+      )
+   RETURN VARCHAR2
+   IS
+      v_args args_tabtype;
+   BEGIN
+      IF nargs_in >= 1 THEN v_args(1) := arg1_in; END IF;
+      IF nargs_in >= 2 THEN v_args(2) := arg2_in; END IF;
+      IF nargs_in >= 3 THEN v_args(3) := arg3_in; END IF;
+      IF nargs_in >= 4 THEN v_args(4) := arg4_in; END IF;
+      IF nargs_in >= 5 THEN v_args(5) := arg5_in; END IF;
+      IF nargs_in >= 6 THEN v_args(6) := arg6_in; END IF;
+      IF nargs_in >= 7 THEN v_args(7) := arg7_in; END IF;
+      IF nargs_in >= 8 THEN v_args(8) := arg8_in; END IF;
+      IF nargs_in >= 9 THEN v_args(9) := arg9_in; END IF;
+      IF nargs_in >= 10 THEN v_args(10) := arg10_in; END IF;
+      RETURN calc (oper_in, v_args);
+   END;
+END;
+/
+
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

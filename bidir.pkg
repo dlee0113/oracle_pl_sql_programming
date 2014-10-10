@@ -1,0 +1,140 @@
+CREATE OR REPLACE PACKAGE bidir
+IS
+   /* Returns data by primary key */
+   FUNCTION rowforid (id_in IN employees.employee_id%TYPE)
+      RETURN employee%ROWTYPE;
+
+   FUNCTION firstrow
+      RETURN PLS_INTEGER;
+
+   FUNCTION lastrow
+      RETURN PLS_INTEGER;
+
+   FUNCTION ROWCOUNT
+      RETURN PLS_INTEGER;
+
+   FUNCTION end_of_data
+      RETURN BOOLEAN;
+
+   /* Iterate through rows in the result set */
+   PROCEDURE setrow (nth IN PLS_INTEGER);
+
+   FUNCTION currrow
+      RETURN employee%ROWTYPE;
+
+   PROCEDURE nextrow;
+
+   PROCEDURE prevrow;
+END;
+/
+
+CREATE OR REPLACE PACKAGE BODY bidir
+IS
+   g_currrow     PLS_INTEGER := NULL;
+
+   TYPE employee_tt IS TABLE OF employee%ROWTYPE
+      INDEX BY BINARY_INTEGER;
+
+   g_employees   employee_tt;
+
+   FUNCTION rowforid (id_in IN employees.employee_id%TYPE)
+      RETURN employee%ROWTYPE
+   IS
+   BEGIN
+      RETURN g_employees (id_in);
+   END;
+
+   FUNCTION ROWCOUNT
+      RETURN PLS_INTEGER
+   IS
+   BEGIN
+      RETURN g_employees.COUNT;
+   END;
+
+   FUNCTION firstrow
+      RETURN PLS_INTEGER
+   IS
+   BEGIN
+      RETURN g_employees.FIRST;
+   END;
+
+   FUNCTION lastrow
+      RETURN PLS_INTEGER
+   IS
+   BEGIN
+      RETURN g_employees.LAST;
+   END;
+
+   FUNCTION end_of_data
+      RETURN BOOLEAN
+   IS
+   BEGIN
+      RETURN g_currrow IS NULL;
+   END;
+
+   PROCEDURE setrow (nth IN PLS_INTEGER)
+   IS
+   BEGIN
+      g_currrow := GREATEST (LEAST (nth, lastrow), firstrow);
+   END;
+
+   FUNCTION currrow
+      RETURN employee%ROWTYPE
+   IS
+   BEGIN
+      RETURN g_employees (g_currrow);
+   END;
+
+   PROCEDURE nextrow
+   IS
+   BEGIN
+      g_currrow := g_employees.NEXT (g_currrow);
+   END;
+
+   PROCEDURE prevrow
+   IS
+   BEGIN
+      g_currrow := g_employees.PRIOR (g_currrow);
+   END;
+BEGIN
+   FOR rec IN (SELECT *
+                 FROM employees)
+   LOOP
+      g_employees (rec.employee_id) := rec;
+   END LOOP;
+
+   g_currrow := firstrow;
+END;
+/
+
+/* Example of usage */
+
+DECLARE
+   l_employee   employee%ROWTYPE;
+BEGIN
+   LOOP
+      EXIT WHEN bidir.end_of_data;
+      l_employee := bidir.currrow;
+      DBMS_OUTPUT.put_line (l_employee.last_name);
+      bidir.nextrow;
+   END LOOP;
+
+   bidir.setrow (bidir.lastrow);
+
+   LOOP
+      EXIT WHEN bidir.end_of_data;
+      l_employee := bidir.currrow;
+      DBMS_OUTPUT.put_line (l_employee.last_name);
+      bidir.prevrow;
+   END LOOP;
+END;
+/
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

@@ -1,0 +1,69 @@
+CREATE OR REPLACE PACKAGE grp
+IS
+   TYPE results_rt IS RECORD (
+      val VARCHAR2(4000),
+      countby INTEGER);
+      
+   TYPE results_tt IS TABLE OF results_rt 
+      INDEX BY BINARY_INTEGER;
+
+   FUNCTION countBy (
+      tab IN VARCHAR2,
+      col IN VARCHAR2, 
+      atleast IN INTEGER := NULL,
+      sch IN VARCHAR2 := NULL,
+      maxlen IN INTEGER := 30)
+      RETURN results_tt;
+END grp;
+/      
+   
+CREATE OR REPLACE PACKAGE BODY grp
+IS
+   FUNCTION countBy (
+      tab IN VARCHAR2,
+      col IN VARCHAR2, 
+      atleast IN INTEGER := NULL,
+      sch IN VARCHAR2 := NULL,
+      maxlen IN INTEGER := 30)
+      RETURN results_tt
+   IS
+      TYPE cv_type IS REF CURSOR;
+      cv cv_type;
+      
+      SQL_string VARCHAR2(32767) := 
+         'SELECT ' || col || ', COUNT(*) 
+            FROM ' || NVL (sch, USER) || '.' || tab ||
+         ' GROUP BY ' || col;
+      
+      rec results_rt;
+      retval results_tt;
+   BEGIN
+      IF atleast IS NOT NULL
+      THEN
+         SQL_string := SQL_string || ' HAVING COUNT(*) >= ' || atleast;
+      END IF;
+    
+      OPEN cv FOR SQL_String;
+      
+      LOOP
+         FETCH cv INTO rec;
+         EXIT WHEN cv%NOTFOUND;
+         retval(cv%ROWCOUNT) := rec;
+      END LOOP;
+      
+      CLOSE cv;
+      
+      RETURN retval;
+   END;
+END grp;
+/   
+
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

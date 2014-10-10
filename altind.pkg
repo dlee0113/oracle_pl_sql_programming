@@ -1,0 +1,339 @@
+CREATE OR REPLACE PACKAGE ALTIND
+IS
+   FUNCTION onerow (employee_id_in IN employee.employee_id%TYPE)
+      RETURN employee%ROWTYPE;
+
+   FUNCTION onerow (
+      last_name_in IN employee.last_name%TYPE,
+      usehash IN BOOLEAN := TRUE)
+      RETURN employee%ROWTYPE;
+
+   FUNCTION onerow_dbind (last_name_in IN employee.last_name%TYPE)
+      RETURN employee%ROWTYPE;
+
+   FUNCTION onerow_dbnoind (last_name_in IN employee.last_name%TYPE)
+      RETURN employee%ROWTYPE;
+
+   PROCEDURE loadcache;
+
+   PROCEDURE showhash;
+
+   PROCEDURE trc (
+      strt_in IN PLS_INTEGER := 2,   /* NYC 5/99 */
+      maxrange_in IN PLS_INTEGER);
+
+   PROCEDURE notrc;
+
+   FUNCTION tracing
+      RETURN BOOLEAN;
+END;
+
+
+
+/
+CREATE OR REPLACE PACKAGE BODY ALTIND    
+IS
+   c_maxrange CONSTANT PLS_INTEGER := POWER (2, 31) - 1;
+   g_maxrange PLS_INTEGER := c_maxrange;
+
+   c_strt CONSTANT PLS_INTEGER := 2;
+   g_strt PLS_INTEGER := c_strt;
+
+   TYPE tab_tabtype IS TABLE OF employee%ROWTYPE
+      INDEX BY BINARY_INTEGER;
+
+   loadtab tab_tabtype;
+
+   TYPE hash_rectype IS RECORD (
+   str                           employee.last_name%TYPE,
+   key                           employee.employee_id%TYPE
+   );
+
+   TYPE hash_tabtype IS TABLE OF hash_rectype
+      INDEX BY BINARY_INTEGER;
+
+   hashtab hash_tabtype;
+   probeby PLS_INTEGER := 3;
+   g_trc BOOLEAN := FALSE;
+
+   PROCEDURE trc (
+      strt_in IN PLS_INTEGER := 2,   /* NYC 5/99 */
+      maxrange_in IN PLS_INTEGER)
+   IS
+   BEGIN
+      g_trc := TRUE;
+      g_maxrange := NVL (maxrange_in, c_maxrange);
+      g_strt := NVL (strt_in, c_strt);
+   END;
+
+   PROCEDURE notrc
+   IS
+   BEGIN
+      g_trc := FALSE;
+      g_maxrange := c_maxrange;
+   END;
+
+   FUNCTION tracing
+      RETURN BOOLEAN
+   IS
+   BEGIN
+      RETURN g_trc;
+   END;
+
+   PROCEDURE probe_ahead (indx IN OUT PLS_INTEGER)
+   /* 5/99 NYC enhance to wrap at end. */
+
+   IS
+   BEGIN
+      IF indx >= c_maxrange - probeby
+      THEN
+         indx := 1;
+      ELSE
+         indx := indx + probeby;
+      END IF;
+   END;
+
+   FUNCTION hashval (str IN VARCHAR2)
+      RETURN PLS_INTEGER
+   IS
+   BEGIN
+      RETURN DBMS_UTILITY.get_hash_value (str, g_strt, g_maxrange);
+   END;
+
+   PROCEDURE add_to_altind (str_in IN VARCHAR2, key_in IN PLS_INTEGER)
+   IS
+      end_search BOOLEAN := FALSE;
+      v_row PLS_INTEGER := hashval (str_in);
+   BEGIN
+      IF tracing
+      THEN
+         do.pl /* do.pkg */ ('Adding key '|| key_in || ' for', str_in);
+      END IF;
+
+
+      /* Resolve hash conflict with linear probe method. */
+
+
+      LOOP
+         IF hashtab.EXISTS (v_row)
+         THEN
+            IF tracing
+            THEN
+               do.pl /* do.pkg */ (
+                  'Conflict for string '|| str_in || ' occurred at row ',
+                  v_row
+               );
+            END IF;
+
+
+            /* If this row is in use and it is NOT the same string,
+               move to the next row and try again. */
+
+
+            IF hashtab (v_row).str != str_in
+            THEN
+               /* Dallas: what about going past the max row? */
+               probe_ahead (v_row);   /* NYC 5/99 */
+            ELSE
+
+               /* Same string, same row. No action necessary. */
+
+               end_search := TRUE;
+            END IF;
+         ELSE
+
+            /* Insert a new row in the hash table. */
+
+            IF tracing
+            THEN
+               do.pl /* do.pkg */ (
+                  'Adding '|| str_in || '-'|| key_in || ' '|| ' to row '|| v_row
+               );
+            END IF;
+
+            hashtab (v_row).str := str_in;
+            hashtab (v_row).key := key_in;
+            end_search := TRUE;
+         END IF;
+
+         EXIT WHEN end_search;
+      END LOOP;
+   END;
+
+   FUNCTION keyval (str_in IN VARCHAR2)
+      RETURN PLS_INTEGER
+   IS
+      end_search BOOLEAN := FALSE;
+      retval PLS_INTEGER := hashval (str_in);
+   BEGIN
+      IF tracing
+      THEN
+         do.pl /* do.pkg */ ('Retrieving key for', str_in);
+      END IF;
+
+      LOOP
+         IF hashtab.EXISTS (retval)
+         THEN
+
+            /* If the string matches, we are done. */
+
+            IF hashtab (retval).str = str_in
+            THEN
+               IF tracing
+               THEN
+                  do.pl /* do.pkg */ ('Found match at', retval);
+               END IF;
+
+               retval := hashtab (retval).key;
+               end_search := TRUE;
+            ELSE
+
+               /* Try the next row. */
+
+               IF tracing
+               THEN
+                  do.pl /* do.pkg */ ('Probing next row at', retval + probeby);
+               END IF;
+
+               probe_ahead (retval);
+
+            END IF;
+         ELSE
+            retval := NULL;
+            end_search := TRUE;
+         END IF;
+
+         EXIT WHEN end_search;
+      END LOOP;
+
+      RETURN retval;
+   END;
+
+   FUNCTION onerow (employee_id_in IN employee.employee_id%TYPE)
+      RETURN employee%ROWTYPE
+   IS
+   BEGIN
+      RETURN loadtab (employee_id_in);
+   END;
+
+   FUNCTION onerow (
+      last_name_in IN employee.last_name%TYPE,
+      usehash IN BOOLEAN := TRUE)
+      RETURN employee%ROWTYPE
+   IS
+      v_employee_id employee.employee_id%TYPE;
+      v_row PLS_INTEGER;
+   BEGIN
+      IF usehash
+      THEN
+         v_employee_id := keyval (last_name_in);
+      ELSE
+         v_row := loadtab.FIRST;
+
+         LOOP
+            EXIT WHEN v_row IS NULL;
+
+            IF loadtab (v_row).last_name = last_name_in
+            THEN
+               v_employee_id := v_row;
+               EXIT;
+            END IF;
+
+            v_row := loadtab.NEXT (v_row);
+         END LOOP;
+      END IF;
+
+      IF v_employee_id IS NULL
+      THEN
+         RETURN NULL;
+      ELSE
+         RETURN onerow (v_employee_id);
+      END IF;
+   END;
+
+   FUNCTION onerow_dbind (last_name_in IN employee.last_name%TYPE)
+      RETURN employee%ROWTYPE
+   IS
+      CURSOR onerow_cur
+      IS
+         SELECT *
+           FROM employee
+          WHERE last_name = last_name_in;
+
+      onerow_rec employee%ROWTYPE;
+   BEGIN
+      OPEN onerow_cur;
+      FETCH onerow_cur INTO onerow_rec;
+      CLOSE onerow_cur;
+      RETURN onerow_rec;
+   END;
+
+
+   FUNCTION onerow_dbnoind (last_name_in IN employee.last_name%TYPE)
+      RETURN employee%ROWTYPE
+   IS
+      CURSOR onerow_cur
+      IS
+         SELECT *
+           FROM employee
+          WHERE RTRIM (last_name) = last_name_in;
+
+      onerow_rec employee%ROWTYPE;
+   BEGIN
+      OPEN onerow_cur;
+      FETCH onerow_cur INTO onerow_rec;
+      CLOSE onerow_cur;
+      RETURN onerow_rec;
+   END;
+
+   PROCEDURE showhash
+   IS
+      v_row PLS_INTEGER := hashtab.FIRST;
+   BEGIN
+      LOOP
+         EXIT WHEN v_row IS NULL;
+         do.pl /* do.pkg */ (
+            'Row '||
+            v_row ||
+            '-Str: '||
+            hashtab (v_row).str ||
+            '-'||
+            'Hash: '||
+            hashval (hashtab (v_row).str) ||
+            '-'||
+            'Key: '||
+            hashtab (v_row).key
+         );
+         v_row := hashtab.NEXT (v_row);
+      END LOOP;
+   END;
+
+   PROCEDURE loadcache
+   IS
+   BEGIN
+      loadtab.DELETE;
+      hashtab.DELETE;
+
+      FOR rec IN ( SELECT *
+                     FROM employee)
+      LOOP
+         loadtab (rec.employee_id) := rec;
+         add_to_altind (rec.last_name, rec.employee_id);
+      END LOOP;
+   END;
+
+BEGIN
+   loadcache;
+END;
+/
+
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/
+

@@ -1,0 +1,148 @@
+/* 
+The query placed directly in application code....
+*/
+CREATE OR REPLACE PROCEDURE do_stuff_with_employee (
+   employee_id_in IN employees.employee_id%TYPE)
+IS
+   onerow_rec   employees%ROWTYPE;
+BEGIN
+   SELECT *
+     INTO onerow_rec
+     FROM employees
+    WHERE employee_id = employee_id_in;
+   /* Do some stuff... */
+END;
+/
+CREATE OR REPLACE PROCEDURE do_stuff_with_employee (
+   employee_id_in IN employees_tp.employee_id_t)
+IS
+   onerow_rec   employees_tp.employees_rt;
+BEGIN
+   onerow_rec := employees_qp.onerow (employee_id);
+   /* Do some stuff... */
+END;
+/
+/*
+The query hidden inside a package body....
+*/
+CREATE OR REPLACE PACKAGE emplu1
+IS
+   FUNCTION onerow (employee_id_in IN employees.employee_id%TYPE)
+      RETURN employees%ROWTYPE;
+END;
+/
+CREATE OR REPLACE PACKAGE BODY emplu1
+IS
+   FUNCTION onerow (employee_id_in IN employees.employee_id%TYPE)
+      RETURN employees%ROWTYPE
+   IS
+      onerow_rec   employees%ROWTYPE;
+   BEGIN
+      SELECT *
+        INTO onerow_rec
+        FROM employees
+       WHERE employee_id = employee_id_in;
+      RETURN onerow_rec;
+   END;
+END;
+/
+
+CREATE OR REPLACE PACKAGE emplu2
+IS
+   FUNCTION onerow (employee_id_in IN employees.employee_id%TYPE)
+      RETURN employees%ROWTYPE;
+END;
+/
+
+CREATE OR REPLACE PACKAGE BODY emplu2
+IS
+   TYPE employee_tt IS TABLE OF employees%ROWTYPE
+      INDEX BY PLS_INTEGER;
+
+   employee_cache   employee_tt;
+
+   FUNCTION onerow (employee_id_in IN employees.employee_id%TYPE)
+      RETURN employees%ROWTYPE
+   IS
+   BEGIN
+      RETURN employee_cache (employee_id_in);
+   END onerow;
+   
+   PROCEDURE load_cache
+   IS
+   BEGIN
+      FOR rec IN (SELECT   *
+                      FROM employees)
+      LOOP
+         employee_cache (rec.employee_id) := rec;     
+      END LOOP;
+   END load_cache;
+BEGIN
+   load_cache;
+END emplu2;
+/
+
+/*
+Adding a result cache to the function header....
+*/
+CREATE OR REPLACE PACKAGE emplu11g
+IS
+   FUNCTION onerow (employee_id_in IN employees.employee_id%TYPE)
+      RETURN employees%ROWTYPE
+      result_cache;
+END;
+/
+/*
+This result cache depends on the employees table, so...
+Whenever any session commits data to this table, all
+result caches so depended are invalidated. The next
+time data is requested, the function body will be
+executed, just like the first time.
+*/
+CREATE OR REPLACE PACKAGE BODY emplu11g
+IS
+   FUNCTION onerow (employee_id_in IN employees.employee_id%TYPE)
+      RETURN employees%ROWTYPE
+      result_cache relies_on (employees)
+   IS
+      onerow_rec   employees%ROWTYPE;
+   BEGIN
+      SELECT *
+        INTO onerow_rec
+        FROM employees
+       WHERE employee_id = employee_id_in;
+       
+      RETURN onerow_rec;
+   END;
+END;
+/
+
+/*
+Demonstration that the cache is NOT necessarily
+related to SQL operations in the function....
+*/
+CREATE OR REPLACE PACKAGE BODY emplu11g
+IS
+   FUNCTION onerow (employee_id_in IN employees.employee_id%TYPE)
+      RETURN employees%ROWTYPE
+      result_cache 
+   IS
+      onerow_rec   employees%ROWTYPE;
+   BEGIN
+      onerow_rec.last_name := get_name (employee_id_in);
+      onerow_rec.first_name := 'Handsome';
+      onerow_rec.employee_id = employee_id_in;
+      RETURN onerow_rec;
+   END;
+END;
+/
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/
+

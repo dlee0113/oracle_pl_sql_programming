@@ -1,0 +1,612 @@
+<TEMPLATE_SET>
+  <TEMPLATE>
+    <NAME>sffeb</NAME>
+    <DESCRIPTION>
+Expands into a call to DBMS_UTILITY.FORMAT_ERROR_BACKTRACE
+</DESCRIPTION>
+    <CODE>
+DBMS_UTILITY.FORMAT_ERROR_BACKTRACE ()
+</CODE>
+  </TEMPLATE> 
+  <TEMPLATE>
+    <NAME>sffes</NAME>
+    <DESCRIPTION>
+Expands into a call to DBMS_UTILITY.FORMAT_ERROR_STACK
+</DESCRIPTION>
+    <CODE>
+DBMS_UTILITY.FORMAT_ERROR_STACK ()
+</CODE>
+  </TEMPLATE>
+  <TEMPLATE>
+    <NAME>sffcs</NAME>
+    <DESCRIPTION>
+Expands into a call to DBMS_UTILITY.FORMAT_CALL_STACK
+</DESCRIPTION>
+    <CODE>
+DBMS_UTILITY.FORMAT_CALL_STACK ()
+</CODE>
+  </TEMPLATE>
+  <TEMPLATE>
+    <NAME>sfpl</NAME>
+    <DESCRIPTION>
+Expands into a call to DBMS_OUTPUT.PUT_LINE
+</DESCRIPTION>
+    <CODE>
+DBMS_OUTPUT.PUT_LINE (REPLACE);
+</CODE>
+  </TEMPLATE>
+  <TEMPLATE>
+    <NAME>sfplb</NAME>
+    <DESCRIPTION>
+Expands into a call to DBMS_OUTPUT.PUT_LINE to display a Boolean
+</DESCRIPTION>
+    <CODE>
+IF val
+THEN
+  DBMS_OUTPUT.put_line ('TRUE');
+ELSIF NOT val
+THEN
+  DBMS_OUTPUT.put_line ('FALSE');
+ELSE
+  DBMS_OUTPUT.put_line ('NULL');
+END IF;
+</CODE>
+  </TEMPLATE>
+  <TEMPLATE>
+    <NAME>sfscs</NAME>
+    <DESCRIPTION>
+Sparse Collection Scan: scan the contents of a collection 
+that may be sparse, using a WHILE loop.
+</DESCRIPTION>
+    <CODE>
+   l_index PLS_INTEGER;
+BEGIN
+   l_index := [collection.FIRST;
+   WHILE (l_index IS NOT NULL) 
+   LOOP
+      l_index := [collection.NEXT (l_index);
+   END LOOP;
+END;
+</CODE>
+    <PARAMETERS>
+      <PARAMETER>
+        <NAME>[collection</NAME>
+        <DESCRIPTION>The name of the variable holding the collection</DESCRIPTION>
+      </PARAMETER>
+    </PARAMETERS>
+  </TEMPLATE>
+  <TEMPLATE>
+    <NAME>sfbcl</NAME>
+    <DESCRIPTION>A BULK COLLECT query with a LIMIT clause</DESCRIPTION>
+    <CODE>
+   CURSOR bulk_collect_cur IS
+      [select_statement
+   TYPE bulk_collect_aat IS TABLE OF bulk_collect_cur%ROWTYPE
+      INDEX BY BINARY_INTEGER;
+   l_data bulk_collect_aa;
+BEGIN
+   OPEN bulk_collect_cur;
+   LOOP
+      FETCH bulk_collect_cur INTO l_data LIMIT [limit;
+      EXIT WHEN l_data.COUNT = 0;
+      FOR indx IN 1 .. l_data
+      LOOP
+         /* Process each row in the collection. */
+      END LOOP;
+   END LOOP;
+END;   
+</CODE>
+    <PARAMETERS>
+      <PARAMETER>
+        <NAME>[select_statement</NAME>
+        <DESCRIPTION>The select statement you want to populate using BULK COLLECT</DESCRIPTION>
+      </PARAMETER>
+      <PARAMETER>
+        <NAME>[limit</NAME>
+        <DESCRIPTION>The value for the LIMIT clause: it can be a variable.</DESCRIPTION>
+      </PARAMETER>
+    </PARAMETERS>
+  </TEMPLATE>
+  <TEMPLATE>
+    <NAME>sfpkgstarter</NAME>
+    <DESCRIPTION>
+A standard package format that you can use as a starting point 
+for development of new packages. Contains a standard header,
+initialization section, procedure and function templates. 
+</DESCRIPTION>
+    <PARAMETERS>
+      <PARAMETER>
+        <NAME>[package_name</NAME>
+        <DESCRIPTION>The name of the package</DESCRIPTION>
+      </PARAMETER>
+    </PARAMETERS>
+    <CODE>
+CREATE OR REPLACE PACKAGE [package_name
+/*
+/ Copyright Information Here
+/
+/ File name:
+/
+/ Overview:
+/
+/ Author(s):
+/
+/ Modification History:
+/   Date        Who         What
+/
+STDHDR*/
+IS
+   /* Decide whether or not you want to expose the package
+      initialization routine! */
+   PROCEDURE initialize;
+END [package_name;
+/
+
+CREATE OR REPLACE PACKAGE BODY [package_name
+/*
+/ Copyright Information Here
+/
+/ File name:
+/
+/ Overview:
+/
+/ Author(s):
+/
+/ Modification History:
+/   Date        Who         What
+/
+*/
+IS
+   PROCEDURE initialize
+   IS
+   BEGIN
+      NULL;
+   END initialize;
+
+   PROCEDURE proc
+   /*
+   / Copyright Information Here
+   /
+   / File name:
+   /
+   / Overview:
+   /
+   / Author(s):
+   /
+   / Modification History:
+   /   Date        Who         What
+   /
+   */
+   IS
+      PROCEDURE initialize
+      IS
+      BEGIN
+         NULL;
+      END initialize;
+
+      PROCEDURE cleanup
+      IS
+      BEGIN
+         NULL;
+      END cleanup;
+   BEGIN
+      initialize;
+      /* REMOVE AFTER REVIEW!
+      
+      Main body of program. Don't forget:
+      
+      ** Use BULK COLLECT and FORALL for multi-row SQL.
+      ** Hide complex rules behind functions.
+      ** Hide SQL statements behind a table API.
+      ** Think about error handling now!
+      ** Keep your executable sections small (no more than 50 lines).
+      
+      */
+      cleanup;
+   EXCEPTION
+      WHEN OTHERS
+      THEN
+         /* Don't forget to clean up here, too! */
+         cleanup;
+         
+         /* Use the standard error logging mechanism.
+          
+            Example: Quest Error Manager, available at:
+            http://www.oracleplsqlprogramming.com/downloads/qem.zip
+         */
+         q$error_manager.raise_error (
+             error_code_in      => SQLCODE
+            , name1_in           => 'NAME1'
+            , value1_in          => 'VALUE'
+            /* Up to five name-value pairs accepted! */
+         );
+   END proc;
+
+   FUNCTION func
+      RETURN datatype
+   /*
+   / Copyright Information Here
+   /
+   / File name:
+   /
+   / Overview:
+   /
+   / Author(s):
+   /
+   / Modification History:
+   /   Date        Who         What
+   /
+   */
+   IS
+      /* The value returned by the function */
+      l_return datatype;
+      
+      PROCEDURE initialize
+      IS
+      BEGIN
+         NULL;
+      END initialize;
+
+      PROCEDURE cleanup
+      IS
+      BEGIN
+         NULL;
+      END cleanup;
+   BEGIN
+      initialize;
+      /* REMOVE AFTER REVIEW!
+      
+      Main body of program. Don't forget:
+      
+      ** Use BULK COLLECT and FORALL for multi-row SQL.
+      ** Hide complex rules behind functions.
+      ** Hide SQL statements behind a table API.
+      ** Think about error handling now!
+      ** Keep your executable sections small (no more than 50 lines).
+      
+      */
+      cleanup;
+      
+      /* Just one return in the executable section! */
+      RETURN l_return;
+   EXCEPTION
+      WHEN OTHERS
+      THEN
+         /* Don't forget to clean up here, too! */
+         cleanup;
+         
+         /* Use the standard error logging mechanism.
+          
+            Example: Quest Error Manager, available at:
+            http://www.oracleplsqlprogramming.com/downloads/qem.zip
+         */
+         q$error_manager.raise_error (
+             error_code_in      => SQLCODE
+            , name1_in           => 'NAME1'
+            , value1_in          => 'VALUE'
+            /* Up to five name-value pairs accepted! */
+            );
+   END func;
+BEGIN
+   initialize;
+END [package_name;
+/
+</CODE>
+  </TEMPLATE>
+  <TEMPLATE>
+    <NAME>sfprocstarter</NAME>
+    <DESCRIPTION>
+A standard procedure format that you can use as a starting point 
+for development of procedures. 
+</DESCRIPTION>
+    <PARAMETERS>
+      <PARAMETER>
+        <NAME>[procedure_name</NAME>
+        <DESCRIPTION>The name of the procedure</DESCRIPTION>
+      </PARAMETER>
+    </PARAMETERS>
+    <CODE>
+CREATE OR REPLACE PROCEDURE [procedure_name
+/*
+/ Copyright Information Here
+/
+/ Program name: [procedure_name
+/
+/ File name:
+/
+/ Overview:
+/
+/ Author(s):
+/
+/ Modification History:
+/   Date        Who         What
+/
+*/
+IS
+  PROCEDURE initialize
+  IS
+  BEGIN
+     NULL;
+  END initialize;
+
+  PROCEDURE cleanup
+  IS
+  BEGIN
+     NULL;
+  END cleanup;
+BEGIN
+  initialize;
+  /* REMOVE AFTER REVIEW!
+      
+  Main body of program. Don't forget:
+      
+  ** Use BULK COLLECT and FORALL for multi-row SQL.
+  ** Hide complex rules behind functions.
+  ** Hide SQL statements behind a table API.
+  ** Think about error handling now!
+  ** Keep your executable sections small (no more than 50 lines).
+      
+  */
+  cleanup;
+EXCEPTION
+  WHEN OTHERS
+  THEN
+     /* Don't forget to clean up here, too! */
+     cleanup;
+         
+     /* Use the standard error logging mechanism.
+          
+        Example: Quest Error Manager, available at:
+        http://www.oracleplsqlprogramming.com/downloads/qem.zip
+     */
+     q$error_manager.raise_error (
+         error_code_in      => SQLCODE
+        , name1_in           => 'NAME1'
+        , value1_in          => 'VALUE'
+        /* Up to five name-value pairs accepted! */
+     );
+END [procedure_name;
+</CODE>
+  </TEMPLATE>
+  <TEMPLATE>
+    <NAME>sffuncstarter</NAME>
+    <DESCRIPTION>
+A standard function format that you can use as a starting point 
+for development of procedures. 
+</DESCRIPTION>
+    <PARAMETERS>
+      <PARAMETER>
+        <NAME>[function_name</NAME>
+        <DESCRIPTION>The name of the function</DESCRIPTION>
+      </PARAMETER>
+      <PARAMETER>
+        <NAME>[datatype</NAME>
+        <DESCRIPTION>The datatype of the RETURN clause of the function</DESCRIPTION>
+      </PARAMETER>
+    </PARAMETERS>
+    <CODE>
+CREATE OR REPLACE FUNCTION [function_name RETURN [datatype
+/*
+/ Copyright Information Here
+/
+/ File name:
+/
+/ Overview:
+/
+/ Author(s):
+/
+/ Modification History:
+/   Date        Who         What
+/
+*/
+IS
+  /* The value returned by the function */
+  l_return [datatype;
+      
+  PROCEDURE initialize
+  IS
+  BEGIN
+     NULL;
+  END initialize;
+
+  PROCEDURE cleanup
+  IS
+  BEGIN
+     NULL;
+  END cleanup;
+BEGIN
+  initialize;
+  /* REMOVE AFTER REVIEW!
+      
+  Main body of program. Don't forget:
+      
+  ** Use BULK COLLECT and FORALL for multi-row SQL.
+  ** Hide complex rules behind functions.
+  ** Hide SQL statements behind a table API.
+  ** Think about error handling now!
+  ** Keep your executable sections small (no more than 50 lines).
+      
+  */
+  cleanup;
+      
+  /* Just one return in the executable section! */
+  RETURN l_return;
+EXCEPTION
+  WHEN OTHERS
+  THEN
+     /* Don't forget to clean up here, too! */
+     cleanup;
+         
+     /* Use the standard error logging mechanism.
+          
+        Example: Quest Error Manager, available at:
+        http://www.oracleplsqlprogramming.com/downloads/qem.zip
+     */
+     q$error_manager.raise_error (
+         error_code_in      => SQLCODE
+        , name1_in           => 'NAME1'
+        , value1_in          => 'VALUE'
+        /* Up to five name-value pairs accepted! */
+        );
+END [function_name;
+/
+</CODE>
+  </TEMPLATE>
+  <TEMPLATE>
+    <NAME>sfwo</NAME>
+    <DESCRIPTION>
+WHEN OTHERS clause that reminds you of all the information you
+should be gathering when you handle an exception.
+</DESCRIPTION>
+    <CODE>
+   EXCEPTION
+      WHEN OTHERS
+      THEN
+         DBMS_OUTPUT.put_line ('Unanticipated Error!');
+         /* What is the error code? */
+         DBMS_OUTPUT.put_line (SQLCODE);
+         /* What is the full error message? */
+         DBMS_OUTPUT.put_line (DBMS_UTILITY.format_error_stack);
+         /* How did I get here? */
+         DBMS_OUTPUT.put_line (DBMS_UTILITY.format_call_stack);
+         /* Available on 10g Release 2 only */
+         DBMS_OUTPUT.put_line (DBMS_UTILITY.format_error_backtrace);
+         /* Do you need to roll back changes here? */
+         ROLLBACK;
+         /* Generally, you should re-raise an exception in WHEN OTHERS. */
+         RAISE;
+</CODE>
+  </TEMPLATE>
+  <TEMPLATE>
+    <NAME>sfwoqem</NAME>
+    <DESCRIPTION>
+WHEN OTHERS clause that relies on the Quest Error Manager 
+to gather all necessary data. You decide how many name-value
+pairs you need.
+</DESCRIPTION>
+    <CODE>
+   EXCEPTION
+      WHEN OTHERS
+      THEN 
+         q$error_manager.raise_unanticipated (    
+            text_in => 'Message'
+         ,  name1_in => 'name'
+         ,  value1_in => value
+         ,  name2_in => 'name'
+         ,  value2_in => value
+         ,  name3_in => 'name'
+         ,  value3_in => value
+         ,  name4_in => 'name'
+         ,  value4_in => value
+         ,  name5_in => 'name'
+         ,  value5_in => value
+         );
+        /* 
+        Add more name-value pairs with add_context: 
+        
+        DECLARE
+           l_instance_id q$error_instance.id%TYPE;
+        BEGIN        
+            q$error_manager.register_error (    
+                error_code_in IN q$error.code%TYPE
+             ,  err_instance_id_out => l_instance_id
+             ,  text_in => 'Message'
+             ,  name1_in => 'name'
+             ,  value1_in => value
+             ,  name2_in => 'name'
+             ,  value2_in => value
+             ,  name3_in => 'name'
+             ,  value3_in => value
+             ,  name4_in => 'name'
+             ,  value4_in => value
+             ,  name5_in => 'name'
+             ,  value5_in => value
+             );
+         
+           q$error_manager.add_context (
+              error_instance_id_in => l_instance_id
+            , NAME_IN => 'name'
+            , value_in => value
+            );*/        
+</CODE>
+  </TEMPLATE>
+  <TEMPLATE>
+    <NAME>sffa</NAME>
+    <DESCRIPTION>
+A FORALL statement that includes SAVE EXCEPTIONS
+and the code needed to iterate through that pseudo-collection
+</DESCRIPTION>
+    <CODE>
+DECLARE 
+   l_array [collection_type;
+   bulk_errors EXCEPTION;
+   PRAGMA EXCEPTION_INIT ( bulk_errors, -24381 );
+BEGIN    
+   FORALL indx IN l_array.FIRST .. l_array.LAST
+      SAVE EXCEPTIONS
+      [dml_starter 
+      /* Must use this somewhere: */ (indx)
+   ;
+EXCEPTION
+   WHEN bulk_errors 
+   THEN 
+      FOR indx IN 1 .. SQL%BULK_EXCEPTIONS.COUNT
+      LOOP
+         /* The index value in the binding array that caused the error. */
+         DBMS_OUTPUT.PUT_LINE (SQL%BULK_EXCEPTIONS(indx).ERROR_INDEX);
+         /* The error code that was raised. 
+            Warning! Oracle stores this as a positive, not negative value.
+         */
+         DBMS_OUTPUT.PUT_LINE (SQL%BULK_EXCEPTIONS(indx).ERROR_CODE);
+      END LOOP;   
+END;
+/
+</CODE>
+    <PARAMETERS>
+      <PARAMETER>
+        <NAME>[collection_type</NAME>
+        <DESCRIPTION>
+      The datatype of the collection used to identify index values
+      in the binding array (not necessarily the same). 
+      </DESCRIPTION>
+      </PARAMETER>
+      <PARAMETER>
+        <NAME>[dml_starter</NAME>
+        <DESCRIPTION>
+      The starting point for your DML statement to be used in 
+      the FORALL operation. You can at least type INSERT, 
+      UPDATE or DELETE. 
+      </DESCRIPTION>
+      </PARAMETER>
+    </PARAMETERS>
+  </TEMPLATE>
+<TEMPLATE>
+    <NAME>sfwa</NAME>
+    <DESCRIPTION>
+Standardized approach to documenting workarounds, including
+what needs to be done to back out the workaround and implement
+the native, bug-fixed approach.
+</DESCRIPTION>
+    <CODE>
+/*WORKAROUND CODED BELOW!
+
+Bug description:
+
+Oracle versions
+   First appeared in: 
+   Reconfirmed in: 
+
+Bug reference:
+
+Workaround description:
+
+Post-bug fix implementation:
+   Replace all code between --WORKAROUNDSTART and --WORKAROUNDEND with:
+
+*/
+--WORKAROUNDSTART
+
+--WORKAROUNDEND
+</CODE>
+  </TEMPLATE>  
+</TEMPLATE_SET>

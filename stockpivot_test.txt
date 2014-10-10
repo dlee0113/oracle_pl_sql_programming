@@ -1,0 +1,133 @@
+
+Table truncated.
+
+
+Running load_stocks_legacy...
+==========================================================
+
+PL/SQL procedure successfully completed.
+
+1000000 rows inserted.
+
+PL/SQL procedure successfully completed.
+
+------------------------------------------------------------------------------
+Session statistics report : 12-MAR-2009 22:34:05
+Snapshot interval         : 57.43 seconds
+
+
+Statistic Name                                                           Value
+------------------------------------------------------------  ----------------
+STAT..redo size                                                    273,003,216
+
+PL/SQL procedure successfully completed.
+
+
+Commit complete.
+
+
+Running load_stocks_forall...
+==========================================================
+
+PL/SQL procedure successfully completed.
+
+1000000 rows inserted.
+
+PL/SQL procedure successfully completed.
+
+------------------------------------------------------------------------------
+Session statistics report : 12-MAR-2009 22:34:11
+Snapshot interval         : 5.07 seconds
+
+
+Statistic Name                                                           Value
+------------------------------------------------------------  ----------------
+STAT..redo size                                                     37,918,276
+
+PL/SQL procedure successfully completed.
+
+
+Commit complete.
+
+
+Running load_stocks...
+==========================================================
+
+PL/SQL procedure successfully completed.
+
+1000000 rows inserted.
+
+PL/SQL procedure successfully completed.
+
+------------------------------------------------------------------------------
+Session statistics report : 12-MAR-2009 22:34:27
+Snapshot interval         : 16.47 seconds
+
+
+Statistic Name                                                           Value
+------------------------------------------------------------  ----------------
+STAT..redo size                                                     37,559,432
+
+PL/SQL procedure successfully completed.
+
+
+Commit complete.
+
+
+Running load_stocks_array...
+==========================================================
+
+PL/SQL procedure successfully completed.
+
+1000000 rows inserted.
+
+PL/SQL procedure successfully completed.
+
+------------------------------------------------------------------------------
+Session statistics report : 12-MAR-2009 22:34:34
+Snapshot interval         : 6.26 seconds
+
+
+Statistic Name                                                           Value
+------------------------------------------------------------  ----------------
+STAT..redo size                                                     37,550,100
+
+PL/SQL procedure successfully completed.
+
+
+Commit complete.
+
+
+Running load_stocks_parallel...
+==========================================================
+
+PL/SQL procedure successfully completed.
+
+1000000 rows inserted.
+
+PL/SQL procedure successfully completed.
+
+------------------------------------------------------------------------------
+Session statistics report : 12-MAR-2009 22:34:37
+Snapshot interval         : 3.41 seconds
+
+
+Statistic Name                                                           Value
+------------------------------------------------------------  ----------------
+STAT..redo size                                                         25,676
+
+PL/SQL procedure successfully completed.
+
+
+Commit complete.
+
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/
+

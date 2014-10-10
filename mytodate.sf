@@ -1,0 +1,64 @@
+/* Formatted on 2001/12/26 15:20 (Formatter Plus v4.5.2) */
+CREATE OR REPLACE FUNCTION my_to_date (value_in IN VARCHAR2)
+   RETURN DATE
+IS
+   TYPE mask_t IS TABLE OF VARCHAR2 (30)
+      INDEX BY BINARY_INTEGER;
+
+   fmts             mask_t;
+   retval           DATE    := NULL;
+   /* Loop index for the scan through the masks */
+   mask_index       INTEGER := 1;
+   /* Boolean to terminate loop if date was converted */
+   date_converted   BOOLEAN := FALSE;
+
+   PROCEDURE init_fmts
+   IS
+   BEGIN
+      fmts (1) := 'DD-MON-RR';
+      fmts (2) := 'DD-MON-YYYY';
+      fmts (3) := 'DD-MON';
+      fmts (4) := 'MM/DD';
+      fmts (5) := 'MM/RR';
+      fmts (6) := 'MMDDRR';
+      fmts (7) := 'MM/YYYY';
+      fmts (8) := 'MM/DD/RR';
+      fmts (9) := 'MM/DD/YYYY';
+      fmts (10) := 'MMDDYYYY';
+      fmts (11) := 'YYYYMMDD';
+      fmts (12) := 'RRMMDD';
+   END;
+BEGIN
+   init_fmts;
+
+   WHILE  mask_index IS NOT NULL AND NOT date_converted
+   LOOP
+      BEGIN
+         /* Try to convert string using mask in table row */
+         retval := TO_DATE (value_in, fmts (mask_index));
+         date_converted := TRUE;
+      EXCEPTION
+         WHEN OTHERS
+         THEN
+            mask_index := fmts.NEXT (mask_index);
+
+            IF mask_index IS NULL
+            THEN
+               RAISE;
+            END IF;
+      END;
+   END LOOP;
+
+   RETURN retval;
+END my_to_date;
+/
+
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

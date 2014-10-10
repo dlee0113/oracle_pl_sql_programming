@@ -1,0 +1,71 @@
+
+Session altered.
+
+
+Running any...
+==========================================================
+
+4 rows created.
+
+
+Commit complete.
+
+
+Running range_high...
+==========================================================
+
+4 rows created.
+
+
+Commit complete.
+
+
+Running hash_high...
+==========================================================
+
+4 rows created.
+
+
+Commit complete.
+
+
+Running range_low...
+==========================================================
+
+4 rows created.
+
+
+Commit complete.
+
+
+Running hash_low...
+==========================================================
+
+4 rows created.
+
+
+Commit complete.
+
+
+Session altered.
+
+
+SESSION_NUMBER  NRECS_ANY NRECS_HASH_LOW_CARD NRECS_HASH_HIGH_CARD NRECS_RANGE_LOW_CARD NRECS_RANGE_HIGH_CARD
+-------------- ---------- ------------------- -------------------- -------------------- ---------------------
+             1     252965              227988               249706               300402                 11926
+             2     253795              167240               250484               267132                354246
+             4     241434              233284               250698               204566                622156
+             3     251806              371488               249112               227900                 11672
+
+4 rows selected.
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/
+
+

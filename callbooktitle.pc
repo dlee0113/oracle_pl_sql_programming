@@ -1,0 +1,54 @@
+#include <stdio.h>
+#include <string.h>
+
+EXEC SQL BEGIN DECLARE SECTION;
+    VARCHAR uid[20];
+    VARCHAR pwd[20];
+    VARCHAR isbn[15];
+    VARCHAR btitle[400];
+EXEC SQL END DECLARE SECTION;
+
+EXEC SQL INCLUDE SQLCA.H;
+
+int sqlerror();
+
+int main()
+{
+    strcpy((char *)uid.arr,"odemo");
+    uid.len = (short) strlen((char *)uid.arr);
+    strcpy((char *)pwd.arr,"odemo");
+    pwd.len = (short) strlen((char *)pwd.arr);
+
+    EXEC SQL WHENEVER SQLERROR DO sqlerror();
+    EXEC SQL CONNECT :uid IDENTIFIED BY :pwd;
+
+    EXEC SQL EXECUTE
+       BEGIN
+          :btitle := booktitle('0-596-00180-0');
+       END;
+    END-EXEC;
+
+    printf("%s\n", btitle.arr);
+
+    /* Disconnect from ORACLE. */
+    EXEC SQL COMMIT WORK RELEASE;
+    exit(0);
+}
+
+sqlerror()
+{
+    EXEC SQL WHENEVER SQLERROR CONTINUE;
+    printf("\n% .70s \n", sqlca.sqlerrm.sqlerrmc);
+    EXEC SQL ROLLBACK WORK RELEASE;
+    exit(1);
+}
+
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

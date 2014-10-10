@@ -1,0 +1,375 @@
+
+Session altered.
+
+
+Running any...
+==========================================================
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.03
+
+1000000 rows selected.
+
+Elapsed: 00:00:05.35
+
+Statistics
+----------------------------------------------------------
+      10198  recursive calls
+          3  db block gets
+      14821  consistent gets
+       4272  physical reads
+        716  redo size
+   22055802  bytes sent via SQL*Net to client
+      22405  bytes received via SQL*Net from client
+       2001  SQL*Net roundtrips to/from client
+          1  sorts (memory)
+          0  sorts (disk)
+    1000000  rows processed
+
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+1 row created.
+
+Elapsed: 00:00:00.03
+
+Commit complete.
+
+Elapsed: 00:00:00.00
+
+Running range...
+==========================================================
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+1000000 rows selected.
+
+Elapsed: 00:00:09.84
+
+Statistics
+----------------------------------------------------------
+      10112  recursive calls
+          5  db block gets
+       4578  consistent gets
+       8070  physical reads
+        708  redo size
+   22060849  bytes sent via SQL*Net to client
+      22405  bytes received via SQL*Net from client
+       2001  SQL*Net roundtrips to/from client
+          5  sorts (memory)
+          1  sorts (disk)
+    1000000  rows processed
+
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+1 row created.
+
+Elapsed: 00:00:00.00
+
+Commit complete.
+
+Elapsed: 00:00:00.00
+
+Running hash...
+==========================================================
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+1000000 rows selected.
+
+Elapsed: 00:00:07.48
+
+Statistics
+----------------------------------------------------------
+      10074  recursive calls
+          3  db block gets
+       4578  consistent gets
+       4269  physical reads
+        708  redo size
+   22145000  bytes sent via SQL*Net to client
+      22405  bytes received via SQL*Net from client
+       2001  SQL*Net roundtrips to/from client
+          5  sorts (memory)
+          0  sorts (disk)
+    1000000  rows processed
+
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+1 row created.
+
+Elapsed: 00:00:00.00
+
+Commit complete.
+
+Elapsed: 00:00:00.00
+
+Running any_ordered...
+==========================================================
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+1000000 rows selected.
+
+Elapsed: 00:00:08.06
+
+Statistics
+----------------------------------------------------------
+      10091  recursive calls
+         12  db block gets
+       4578  consistent gets
+       7649  physical reads
+        708  redo size
+   22042405  bytes sent via SQL*Net to client
+      22405  bytes received via SQL*Net from client
+       2001  SQL*Net roundtrips to/from client
+          2  sorts (memory)
+          3  sorts (disk)
+    1000000  rows processed
+
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+1 row created.
+
+Elapsed: 00:00:00.00
+
+Commit complete.
+
+Elapsed: 00:00:00.00
+
+Running range_ordered...
+==========================================================
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+1000000 rows selected.
+
+Elapsed: 00:00:10.59
+
+Statistics
+----------------------------------------------------------
+      10104  recursive calls
+         10  db block gets
+       4578  consistent gets
+       8086  physical reads
+        708  redo size
+   21956807  bytes sent via SQL*Net to client
+      22405  bytes received via SQL*Net from client
+       2001  SQL*Net roundtrips to/from client
+          5  sorts (memory)
+          1  sorts (disk)
+    1000000  rows processed
+
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+1 row created.
+
+Elapsed: 00:00:00.00
+
+Commit complete.
+
+Elapsed: 00:00:00.00
+
+Running hash_ordered...
+==========================================================
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+1000000 rows selected.
+
+Elapsed: 00:00:07.84
+
+Statistics
+----------------------------------------------------------
+      10074  recursive calls
+          3  db block gets
+       4578  consistent gets
+       4269  physical reads
+        708  redo size
+   22060826  bytes sent via SQL*Net to client
+      22405  bytes received via SQL*Net from client
+       2001  SQL*Net roundtrips to/from client
+          5  sorts (memory)
+          0  sorts (disk)
+    1000000  rows processed
+
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+1 row created.
+
+Elapsed: 00:00:00.00
+
+Commit complete.
+
+Elapsed: 00:00:00.00
+
+Running any_clustered...
+==========================================================
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+1000000 rows selected.
+
+Elapsed: 00:00:09.57
+
+Statistics
+----------------------------------------------------------
+      10099  recursive calls
+         15  db block gets
+       4578  consistent gets
+       8714  physical reads
+        708  redo size
+   22053793  bytes sent via SQL*Net to client
+      22405  bytes received via SQL*Net from client
+       2001  SQL*Net roundtrips to/from client
+          1  sorts (memory)
+          4  sorts (disk)
+    1000000  rows processed
+
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+1 row created.
+
+Elapsed: 00:00:00.01
+
+Commit complete.
+
+Elapsed: 00:00:00.01
+
+Running range_clustered...
+==========================================================
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+1000000 rows selected.
+
+Elapsed: 00:00:10.90
+
+Statistics
+----------------------------------------------------------
+      10108  recursive calls
+         10  db block gets
+       4578  consistent gets
+       8087  physical reads
+        708  redo size
+   21951353  bytes sent via SQL*Net to client
+      22405  bytes received via SQL*Net from client
+       2001  SQL*Net roundtrips to/from client
+          5  sorts (memory)
+          1  sorts (disk)
+    1000000  rows processed
+
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+1 row created.
+
+Elapsed: 00:00:00.03
+
+Commit complete.
+
+Elapsed: 00:00:00.00
+
+Running hash_clustered...
+==========================================================
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.01
+
+1000000 rows selected.
+
+Elapsed: 00:00:08.09
+
+Statistics
+----------------------------------------------------------
+      10078  recursive calls
+          3  db block gets
+       4578  consistent gets
+       4271  physical reads
+        708  redo size
+   22060468  bytes sent via SQL*Net to client
+      22405  bytes received via SQL*Net from client
+       2001  SQL*Net roundtrips to/from client
+          5  sorts (memory)
+          0  sorts (disk)
+    1000000  rows processed
+
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:00.00
+
+1 row created.
+
+Elapsed: 00:00:00.00
+
+Commit complete.
+
+Elapsed: 00:00:00.00
+
+Session altered.
+
+Elapsed: 00:00:00.00
+
+PARALLEL_OPTION                ELAPSED_SECONDS
+------------------------------ ---------------
+any                                       5.37
+hash                                      7.48
+hash_ordered                              7.84
+any_ordered                               8.06
+hash_clustered                             8.1
+any_clustered                             9.58
+range                                     9.84
+range_ordered                            10.59
+range_clustered                           10.9
+
+9 rows selected.
+
+Elapsed: 00:00:00.04
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/
+

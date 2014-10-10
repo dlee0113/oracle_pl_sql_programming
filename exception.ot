@@ -1,0 +1,39 @@
+CREATE TYPE exception_t AS OBJECT (
+   name VARCHAR2(100),
+   code INTEGER,
+   description VARCHAR2(4000),
+   help_text VARCHAR2(4000),
+   recommendation VARCHAR2(4000),
+   error_stack CLOB,
+   call_stack CLOB,
+   created_on DATE,
+   created_by VARCHAR2(100)
+   )
+   NOT FINAL
+   ;
+/
+
+CREATE TYPE dynsql_exception_t UNDER exception_t (
+   sql_string CLOB
+   )
+   NOT FINAL
+   ;
+/
+
+CREATE TYPE employee_exception_t UNDER exception_t (
+   employee_id INTEGER,
+   rule_id INTEGER
+   )
+   ;
+/
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/
+
+

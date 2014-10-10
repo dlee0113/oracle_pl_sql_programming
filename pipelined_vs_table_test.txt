@@ -1,0 +1,646 @@
+
+Table truncated.
+
+
+PL/SQL procedure successfully completed.
+
+
+Running pipelined test with 10 elements...
+===============================================
+
+PL/SQL procedure successfully completed.
+
+
+PL/SQL procedure successfully completed.
+
+
+10 rows selected.
+
+
+Statistics
+----------------------------------------------------------
+          2  recursive calls
+          0  db block gets
+          0  consistent gets
+          0  physical reads
+          0  redo size
+        596  bytes sent via SQL*Net to client
+        416  bytes received via SQL*Net from client
+          2  SQL*Net roundtrips to/from client
+          0  sorts (memory)
+          0  sorts (disk)
+         10  rows processed
+
+
+PL/SQL procedure successfully completed.
+
+
+1 row created.
+
+
+Statistics
+----------------------------------------------------------
+          1  recursive calls
+         23  db block gets
+          4  consistent gets
+          2  physical reads
+       1364  redo size
+        913  bytes sent via SQL*Net to client
+       1227  bytes received via SQL*Net from client
+          4  SQL*Net roundtrips to/from client
+          1  sorts (memory)
+          0  sorts (disk)
+          1  rows processed
+
+
+Commit complete.
+
+
+Running table test with 10 elements...
+===============================================
+
+PL/SQL procedure successfully completed.
+
+
+PL/SQL procedure successfully completed.
+
+
+10 rows selected.
+
+
+Statistics
+----------------------------------------------------------
+          2  recursive calls
+          0  db block gets
+          0  consistent gets
+          0  physical reads
+          0  redo size
+        596  bytes sent via SQL*Net to client
+        416  bytes received via SQL*Net from client
+          2  SQL*Net roundtrips to/from client
+          0  sorts (memory)
+          0  sorts (disk)
+         10  rows processed
+
+
+PL/SQL procedure successfully completed.
+
+
+1 row created.
+
+
+Statistics
+----------------------------------------------------------
+          1  recursive calls
+          5  db block gets
+          1  consistent gets
+          0  physical reads
+          0  redo size
+        913  bytes sent via SQL*Net to client
+       1223  bytes received via SQL*Net from client
+          4  SQL*Net roundtrips to/from client
+          1  sorts (memory)
+          0  sorts (disk)
+          1  rows processed
+
+
+Commit complete.
+
+
+Running pipelined test with 100 elements...
+===============================================
+
+PL/SQL procedure successfully completed.
+
+
+PL/SQL procedure successfully completed.
+
+
+100 rows selected.
+
+
+Statistics
+----------------------------------------------------------
+          2  recursive calls
+          0  db block gets
+          0  consistent gets
+          0  physical reads
+          0  redo size
+       1046  bytes sent via SQL*Net to client
+        416  bytes received via SQL*Net from client
+          2  SQL*Net roundtrips to/from client
+          0  sorts (memory)
+          0  sorts (disk)
+        100  rows processed
+
+
+PL/SQL procedure successfully completed.
+
+
+1 row created.
+
+
+Statistics
+----------------------------------------------------------
+          1  recursive calls
+          5  db block gets
+          1  consistent gets
+          0  physical reads
+          0  redo size
+        913  bytes sent via SQL*Net to client
+       1228  bytes received via SQL*Net from client
+          4  SQL*Net roundtrips to/from client
+          1  sorts (memory)
+          0  sorts (disk)
+          1  rows processed
+
+
+Commit complete.
+
+
+Running table test with 100 elements...
+===============================================
+
+PL/SQL procedure successfully completed.
+
+
+PL/SQL procedure successfully completed.
+
+
+100 rows selected.
+
+
+Statistics
+----------------------------------------------------------
+          2  recursive calls
+          0  db block gets
+          0  consistent gets
+          0  physical reads
+          0  redo size
+       1046  bytes sent via SQL*Net to client
+        416  bytes received via SQL*Net from client
+          2  SQL*Net roundtrips to/from client
+          0  sorts (memory)
+          0  sorts (disk)
+        100  rows processed
+
+
+PL/SQL procedure successfully completed.
+
+
+1 row created.
+
+
+Statistics
+----------------------------------------------------------
+          1  recursive calls
+          5  db block gets
+          1  consistent gets
+          0  physical reads
+          0  redo size
+        913  bytes sent via SQL*Net to client
+       1223  bytes received via SQL*Net from client
+          4  SQL*Net roundtrips to/from client
+          1  sorts (memory)
+          0  sorts (disk)
+          1  rows processed
+
+
+Commit complete.
+
+
+Running pipelined test with 1000 elements...
+===============================================
+
+PL/SQL procedure successfully completed.
+
+
+PL/SQL procedure successfully completed.
+
+
+1000 rows selected.
+
+
+Statistics
+----------------------------------------------------------
+          2  recursive calls
+          0  db block gets
+          0  consistent gets
+          0  physical reads
+          0  redo size
+       5673  bytes sent via SQL*Net to client
+        427  bytes received via SQL*Net from client
+          3  SQL*Net roundtrips to/from client
+          0  sorts (memory)
+          0  sorts (disk)
+       1000  rows processed
+
+
+PL/SQL procedure successfully completed.
+
+
+1 row created.
+
+
+Statistics
+----------------------------------------------------------
+          1  recursive calls
+          5  db block gets
+          1  consistent gets
+          0  physical reads
+          0  redo size
+        913  bytes sent via SQL*Net to client
+       1229  bytes received via SQL*Net from client
+          4  SQL*Net roundtrips to/from client
+          1  sorts (memory)
+          0  sorts (disk)
+          1  rows processed
+
+
+Commit complete.
+
+
+Running table test with 1000 elements...
+===============================================
+
+PL/SQL procedure successfully completed.
+
+
+PL/SQL procedure successfully completed.
+
+
+1000 rows selected.
+
+
+Statistics
+----------------------------------------------------------
+          2  recursive calls
+          0  db block gets
+          0  consistent gets
+          0  physical reads
+          0  redo size
+       5673  bytes sent via SQL*Net to client
+        427  bytes received via SQL*Net from client
+          3  SQL*Net roundtrips to/from client
+          0  sorts (memory)
+          0  sorts (disk)
+       1000  rows processed
+
+
+PL/SQL procedure successfully completed.
+
+
+1 row created.
+
+
+Statistics
+----------------------------------------------------------
+          1  recursive calls
+          5  db block gets
+          1  consistent gets
+          0  physical reads
+          0  redo size
+        913  bytes sent via SQL*Net to client
+       1225  bytes received via SQL*Net from client
+          4  SQL*Net roundtrips to/from client
+          1  sorts (memory)
+          0  sorts (disk)
+          1  rows processed
+
+
+Commit complete.
+
+
+Running pipelined test with 10000 elements...
+===============================================
+
+PL/SQL procedure successfully completed.
+
+
+PL/SQL procedure successfully completed.
+
+
+10000 rows selected.
+
+
+Statistics
+----------------------------------------------------------
+          2  recursive calls
+          0  db block gets
+          0  consistent gets
+          0  physical reads
+          0  redo size
+      52959  bytes sent via SQL*Net to client
+        625  bytes received via SQL*Net from client
+         21  SQL*Net roundtrips to/from client
+          0  sorts (memory)
+          0  sorts (disk)
+      10000  rows processed
+
+
+PL/SQL procedure successfully completed.
+
+
+1 row created.
+
+
+Statistics
+----------------------------------------------------------
+          1  recursive calls
+          5  db block gets
+          1  consistent gets
+          0  physical reads
+          0  redo size
+        913  bytes sent via SQL*Net to client
+       1230  bytes received via SQL*Net from client
+          4  SQL*Net roundtrips to/from client
+          1  sorts (memory)
+          0  sorts (disk)
+          1  rows processed
+
+
+Commit complete.
+
+
+Running table test with 10000 elements...
+===============================================
+
+PL/SQL procedure successfully completed.
+
+
+PL/SQL procedure successfully completed.
+
+
+10000 rows selected.
+
+
+Statistics
+----------------------------------------------------------
+          2  recursive calls
+          0  db block gets
+          0  consistent gets
+          0  physical reads
+          0  redo size
+      52959  bytes sent via SQL*Net to client
+        625  bytes received via SQL*Net from client
+         21  SQL*Net roundtrips to/from client
+          0  sorts (memory)
+          0  sorts (disk)
+      10000  rows processed
+
+
+PL/SQL procedure successfully completed.
+
+
+1 row created.
+
+
+Statistics
+----------------------------------------------------------
+          1  recursive calls
+          5  db block gets
+          1  consistent gets
+          0  physical reads
+          0  redo size
+        913  bytes sent via SQL*Net to client
+       1226  bytes received via SQL*Net from client
+          4  SQL*Net roundtrips to/from client
+          1  sorts (memory)
+          0  sorts (disk)
+          1  rows processed
+
+
+Commit complete.
+
+
+Running pipelined test with 100000 elements...
+===============================================
+
+PL/SQL procedure successfully completed.
+
+
+PL/SQL procedure successfully completed.
+
+
+100000 rows selected.
+
+
+Statistics
+----------------------------------------------------------
+          2  recursive calls
+          0  db block gets
+          0  consistent gets
+          0  physical reads
+          0  redo size
+     525819  bytes sent via SQL*Net to client
+       2605  bytes received via SQL*Net from client
+        201  SQL*Net roundtrips to/from client
+          0  sorts (memory)
+          0  sorts (disk)
+     100000  rows processed
+
+
+PL/SQL procedure successfully completed.
+
+
+1 row created.
+
+
+Statistics
+----------------------------------------------------------
+          1  recursive calls
+          5  db block gets
+          1  consistent gets
+          0  physical reads
+          0  redo size
+        912  bytes sent via SQL*Net to client
+       1231  bytes received via SQL*Net from client
+          4  SQL*Net roundtrips to/from client
+          1  sorts (memory)
+          0  sorts (disk)
+          1  rows processed
+
+
+Commit complete.
+
+
+Running table test with 100000 elements...
+===============================================
+
+PL/SQL procedure successfully completed.
+
+
+PL/SQL procedure successfully completed.
+
+
+100000 rows selected.
+
+
+Statistics
+----------------------------------------------------------
+          2  recursive calls
+          0  db block gets
+          0  consistent gets
+          0  physical reads
+          0  redo size
+     525819  bytes sent via SQL*Net to client
+       2605  bytes received via SQL*Net from client
+        201  SQL*Net roundtrips to/from client
+          0  sorts (memory)
+          0  sorts (disk)
+     100000  rows processed
+
+
+PL/SQL procedure successfully completed.
+
+
+1 row created.
+
+
+Statistics
+----------------------------------------------------------
+          1  recursive calls
+          5  db block gets
+          1  consistent gets
+          0  physical reads
+          0  redo size
+        913  bytes sent via SQL*Net to client
+       1227  bytes received via SQL*Net from client
+          4  SQL*Net roundtrips to/from client
+          1  sorts (memory)
+          0  sorts (disk)
+          1  rows processed
+
+
+Commit complete.
+
+
+Running pipelined test with 500000 elements...
+===============================================
+
+PL/SQL procedure successfully completed.
+
+
+PL/SQL procedure successfully completed.
+
+
+500000 rows selected.
+
+
+Statistics
+----------------------------------------------------------
+          2  recursive calls
+          0  db block gets
+          0  consistent gets
+          0  physical reads
+          0  redo size
+    2627419  bytes sent via SQL*Net to client
+      11405  bytes received via SQL*Net from client
+       1001  SQL*Net roundtrips to/from client
+          0  sorts (memory)
+          0  sorts (disk)
+     500000  rows processed
+
+
+PL/SQL procedure successfully completed.
+
+
+1 row created.
+
+
+Statistics
+----------------------------------------------------------
+          1  recursive calls
+          5  db block gets
+          1  consistent gets
+          0  physical reads
+          0  redo size
+        913  bytes sent via SQL*Net to client
+       1231  bytes received via SQL*Net from client
+          4  SQL*Net roundtrips to/from client
+          1  sorts (memory)
+          0  sorts (disk)
+          1  rows processed
+
+
+Commit complete.
+
+
+Running table test with 500000 elements...
+===============================================
+
+PL/SQL procedure successfully completed.
+
+
+PL/SQL procedure successfully completed.
+
+
+500000 rows selected.
+
+
+Statistics
+----------------------------------------------------------
+          2  recursive calls
+          0  db block gets
+          0  consistent gets
+          0  physical reads
+          0  redo size
+    2627419  bytes sent via SQL*Net to client
+      11405  bytes received via SQL*Net from client
+       1001  SQL*Net roundtrips to/from client
+          0  sorts (memory)
+          0  sorts (disk)
+     500000  rows processed
+
+
+PL/SQL procedure successfully completed.
+
+
+1 row created.
+
+
+Statistics
+----------------------------------------------------------
+          1  recursive calls
+          5  db block gets
+          1  consistent gets
+          0  physical reads
+          0  redo size
+        914  bytes sent via SQL*Net to client
+       1227  bytes received via SQL*Net from client
+          4  SQL*Net roundtrips to/from client
+          1  sorts (memory)
+          0  sorts (disk)
+          1  rows processed
+
+
+Commit complete.
+
+
+FUNCTION_TYPE                  COLLECTION_SIZE PGA_MEMORY_USED ELAPSED_SECS
+------------------------------ --------------- --------------- ------------
+pipelined                                   10               0            0
+table                                       10               0          .01
+pipelined                                  100               0          .01
+table                                      100               0          .02
+pipelined                                 1000               0          .02
+table                                     1000          327680          .02
+pipelined                                10000               0          .05
+table                                    10000         2031616          .08
+pipelined                               100000               0          .42
+table                                   100000        18546688           .6
+pipelined                               500000               0         2.03
+table                                   500000        92209152         2.99
+
+12 rows selected.
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/
+
+

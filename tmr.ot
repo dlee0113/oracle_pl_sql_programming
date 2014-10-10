@@ -1,0 +1,202 @@
+/*
+Overview: 
+   Object type to start and stop a timer allowing you to calculate
+   elapsed time down to the hundredth of a second.
+
+Author: Steven Feuerstein, steven@stevenfeuerstein.com
+          
+Requirements: 
+   Oracle10g to take advantage of CPU timing. If on Oracle8i or 9i,
+   then remove the line next to this comment:
+   
+   "comment out this line for Oracle8i/9i"     
+*/      
+DROP TYPE tmr_t FORCE;
+
+CREATE TYPE tmr_t AS OBJECT (
+   -- SHOULD BE private attributes....
+   starttime      INTEGER
+  ,endtime        INTEGER
+  ,startcputime   INTEGER
+  ,endcputime     INTEGER
+  
+  -- Public attributes
+  ,repetitions   INTEGER
+  ,NAME           VARCHAR2 (2000)
+  
+  ,MEMBER PROCEDURE go -- Cannot name a PL/SQL procedure START
+  ,MEMBER PROCEDURE STOP (show_timing IN BOOLEAN := TRUE)
+  ,MEMBER FUNCTION timing RETURN INTEGER
+  ,MEMBER FUNCTION cputiming RETURN INTEGER
+  ,MEMBER FUNCTION timing_desc RETURN VARCHAR2
+  ,MEMBER PROCEDURE RESET (NAME IN VARCHAR2 := NULL)
+
+   -- Replacement constructor, with different name
+   ,STATIC FUNCTION make (NAME IN VARCHAR2, repetitions IN INTEGER := 1)
+      RETURN tmr_t
+	  
+   -- New in Oracle9i R2: user-defined constructor!
+   ,CONSTRUCTOR FUNCTION tmr_t (
+      SELF          IN OUT   tmr_t
+     ,NAME          IN       VARCHAR2
+     ,repetitions   IN       INTEGER
+   )
+      RETURN SELF AS RESULT
+);
+/
+
+CREATE OR REPLACE TYPE BODY tmr_t
+AS
+   STATIC FUNCTION make (NAME IN VARCHAR2, repetitions IN INTEGER := 1)
+      RETURN tmr_t
+   IS
+   BEGIN
+      RETURN tmr_t (NULL, NULL, NULL, NULL, NVL (repetitions, 1), NAME);
+   END;
+   CONSTRUCTOR FUNCTION tmr_t (
+      SELF          IN OUT   tmr_t
+     ,NAME          IN       VARCHAR2
+     ,repetitions   IN       INTEGER
+   )
+      RETURN SELF AS RESULT
+   IS
+   BEGIN
+      SELF.repetitions := NVL (repetitions, 1);
+      SELF.NAME := NAME;
+      RETURN;
+   END;
+   MEMBER PROCEDURE go
+   IS
+   BEGIN
+      IF starttime IS NOT NULL
+      THEN
+         DBMS_OUTPUT.put_line ('You have already started timer "' || NAME
+                               || '"'
+                              );
+      ELSE
+         starttime := DBMS_UTILITY.get_time;
+         /* comment out this line for Oracle8i/9i */ startcputime := DBMS_UTILITY.get_cpu_time;
+      END IF;
+   END;
+   MEMBER PROCEDURE STOP (show_timing IN BOOLEAN := TRUE)
+   IS
+   BEGIN
+      IF endtime IS NOT NULL
+      THEN
+         DBMS_OUTPUT.put_line ('You have already stopped timer "' || NAME
+                               || '"'
+                              );
+      ELSE
+         endtime := DBMS_UTILITY.get_time;
+         /* comment out this line for Oracle8i/9i */ endcputime := DBMS_UTILITY.get_cpu_time;
+
+         IF show_timing
+         THEN
+            DBMS_OUTPUT.put_line (timing_desc);
+         END IF;
+      END IF;
+   END;
+   MEMBER PROCEDURE RESET (NAME IN VARCHAR2 := NULL)
+   IS
+   BEGIN
+      starttime := NULL;
+      endtime := NULL;
+
+      IF NAME IS NOT NULL
+      THEN
+         SELF.NAME := NAME;
+      END IF;
+   END;
+   MEMBER FUNCTION timing
+      RETURN INTEGER
+   IS
+   BEGIN
+      IF endtime IS NULL
+      THEN
+         DBMS_OUTPUT.put_line (   'You must stop timer "'
+                               || NAME
+                               || '"'
+                               || ' before you can get timing information.'
+                              );
+      END IF;
+
+      -- Avoid "epoch time" wrap around (thanks, Solomon Yakobson)
+      -- RETURN endTime - startTime;
+      RETURN (MOD (endtime - starttime + POWER (2, 32), POWER (2, 32)));
+   END;
+   MEMBER FUNCTION cputiming
+      RETURN INTEGER
+   IS
+   BEGIN
+      IF endcputime IS NULL
+      THEN
+         DBMS_OUTPUT.put_line (   'You must stop timer "'
+                               || NAME
+                               || '"'
+                               || ' before you can get timing information.'
+                              );
+      END IF;
+
+      -- Avoid "epoch time" wrap around (thanks, Solomon Yakobson)
+      -- RETURN endTime - startTime;
+      RETURN (MOD (endcputime - startcputime + POWER (2, 32), POWER (2, 32)));
+   END;
+   MEMBER FUNCTION timing_desc
+      RETURN VARCHAR2
+   IS
+      retval   VARCHAR2 (2000);
+   BEGIN
+      IF endtime IS NULL
+      THEN
+         DBMS_OUTPUT.put_line (   'You must stop timer "'
+                               || NAME
+                               || '"'
+                               || ' before you can get timing information.'
+                              );
+      END IF;
+
+      IF NVL (repetitions, 1) > 1
+      THEN
+         retval :=
+               'Timings in seconds for "'
+            || NAME
+            || '":'
+            || CHR (10)
+            || 'Elapsed = '
+            || TO_CHAR (timing / 100)
+            || ' - per rep '
+            || TO_CHAR ((timing / 100) / repetitions)
+            || CHR (10)
+            || 'CPU     = '
+            || TO_CHAR (cputiming / 100)
+            || ' - per rep '
+            || TO_CHAR ((cputiming / 100) / repetitions);
+      ELSE
+         retval :=
+               'Timings in seconds for "'
+            || NAME
+            || '":'
+            || CHR (10)
+            || 'Elapsed  = '
+            || TO_CHAR (timing / 100)
+            || CHR (10)
+            || 'CPU      = '
+            || TO_CHAR (cputiming / 100);
+      END IF;
+
+      RETURN retval;
+   END;
+END;
+/
+
+GRANT EXECUTE ON tmr_t TO PUBLIC;
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/
+

@@ -1,0 +1,80 @@
+DROP TABLE customer
+/
+
+CREATE TABLE customer
+(
+   customer_id        INTEGER
+ , balance            NUMBER
+ , pref_type          VARCHAR2 (100)
+ , disc_eligibility   CHAR (1)
+)
+/
+
+CREATE OR REPLACE PACKAGE customer_rules
+IS
+   FUNCTION min_balance
+      RETURN PLS_INTEGER;                                        
+
+   FUNCTION eligible_for_discount (customer_in IN customer%ROWTYPE)
+      RETURN BOOLEAN;
+
+   FUNCTION eligible_for_discount (
+      customer_id_in IN customer.customer_id%TYPE
+   )
+      RETURN BOOLEAN;
+END customer_rules;
+/
+
+CREATE OR REPLACE PACKAGE BODY customer_rules
+IS
+   c_min_balance   CONSTANT PLS_INTEGER := 10000;
+
+   FUNCTION min_balance
+      RETURN PLS_INTEGER
+   IS
+   BEGIN
+      RETURN c_min_balance;
+   END;
+
+   FUNCTION eligible_for_discount (customer_in IN customer%ROWTYPE)
+      RETURN BOOLEAN
+   IS
+      retval   BOOLEAN;
+   BEGIN
+      /* Perform all validations here. */
+      retval :=
+             customer_in.balance > min_balance
+         AND customer_in.pref_type = 'MOST FAVORED'
+         AND customer_in.disc_eligibility = 'Y';
+
+      RETURN retval;
+   END;
+
+   FUNCTION eligible_for_discount (
+      customer_id_in IN customer.customer_id%TYPE
+   )
+      RETURN BOOLEAN
+   IS
+      customer_rec   customer%ROWTYPE;
+   BEGIN
+      /* Retrieve a record for this primary key. */
+      SELECT *
+        INTO customer_rec
+        FROM customer
+       WHERE customer_id = customer_id_in;
+
+      /* Use other function to calculate eligibility. */
+      RETURN eligible_for_discount (customer_rec);
+   END;
+END customer_rules;
+/
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/
+

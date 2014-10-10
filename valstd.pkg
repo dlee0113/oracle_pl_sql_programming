@@ -1,0 +1,52 @@
+CREATE OR REPLACE PACKAGE valstd
+IS
+   PROCEDURE progwith (str IN VARCHAR2);
+   PROCEDURE pw_rae;
+END valstd;
+/
+CREATE OR REPLACE PACKAGE BODY valstd
+IS
+   CURSOR objwith_cur (str IN VARCHAR2)
+   IS
+      SELECT name, text
+        FROM USER_SOURCE
+       WHERE UPPER (text) LIKE '%' || UPPER (str) || '%'
+         AND name != 'VALSTD';
+        
+   PROCEDURE progwith (str IN VARCHAR2)
+   IS
+   BEGIN
+      FOR prog_rec IN objwith_cur (str)
+      LOOP
+         DBMS_OUTPUT.PUT_LINE (prog_rec.name || ': ' || prog_rec.text);
+      END LOOP;
+   END;
+
+   PROCEDURE pw_rae
+   IS
+      prog_rec objwith_cur%ROWTYPE;
+   BEGIN
+      progwith ('RAISE_APPLICATION_ERROR');
+   END;
+
+END valstd;
+/
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/
+
+
+
+
+/*======================================================================
+| Supplement to the third edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2002 O'Reilly &
+| Associates, Inc. To submit corrections or find more code samples visit
+| http://www.oreilly.com/catalog/oraclep3/
+*/

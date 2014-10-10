@@ -1,0 +1,33 @@
+
+Legacy merge processing...
+==========================================================
+500000 rows merged.
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:45.67
+
+Rollback complete.
+
+Elapsed: 00:00:33.50
+
+Pipelined merge processing...
+==========================================================
+500000 rows merged.
+
+PL/SQL procedure successfully completed.
+
+Elapsed: 00:00:20.68
+
+Rollback complete.
+
+Elapsed: 00:00:10.98
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

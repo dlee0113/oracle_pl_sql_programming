@@ -1,0 +1,400 @@
+CREATE OR REPLACE PACKAGE fileio92
+IS
+   -- Constants for different outcome
+   c_success          CONSTANT INTEGER := 908;
+   c_file_not_found   CONSTANT INTEGER := -55;
+   c_not_removeable   CONSTANT INTEGER := 28987632222;
+   c_not_renameable   CONSTANT INTEGER := 3000000;
+   c_no_extension     CONSTANT INTEGER := -2 ** 31 + 1;     -- Lysaker 3/2004
+
+   FUNCTION dir_available (dir_in IN VARCHAR2, uppercase_in IN BOOLEAN
+            := TRUE)
+      RETURN BOOLEAN;
+
+   PROCEDURE validate_directory (
+      dir_in         IN   VARCHAR2
+     ,uppercase_in   IN   BOOLEAN := TRUE
+   );
+
+   PROCEDURE show_directories;
+
+   PROCEDURE fremove (
+      file_in          IN       VARCHAR2
+     ,dir_in           IN       VARCHAR2
+     ,result_out       OUT      INTEGER
+     ,show_result_in   IN       BOOLEAN := FALSE
+   );
+
+   FUNCTION flength (dir_in IN VARCHAR2, file_in IN VARCHAR2)
+      RETURN PLS_INTEGER;
+
+   FUNCTION fexists (dir_in IN VARCHAR2, file_in IN VARCHAR2)
+      RETURN BOOLEAN;
+
+   FUNCTION fexists_wa (dir_in IN VARCHAR2, file_in IN VARCHAR2)
+      RETURN BOOLEAN;
+
+   PROCEDURE chgext (
+      dir_in           IN       VARCHAR2
+     ,file_in          IN       VARCHAR2
+     ,newext_in        IN       VARCHAR2
+     ,result_out       OUT      INTEGER
+     ,delim_in         IN       VARCHAR2 := '.'
+     ,show_result_in   IN       BOOLEAN := FALSE
+   );
+
+   /* Simplified back up */
+   PROCEDURE set_backup_dirs (
+      source_dir_in      IN   VARCHAR2
+     ,archive_dir_in     IN   VARCHAR2
+     ,validate_dirs_in   IN   BOOLEAN := TRUE
+   );
+
+   FUNCTION source_dir
+      RETURN VARCHAR2;
+
+   FUNCTION archive_dir
+      RETURN VARCHAR2;
+
+   PROCEDURE BACKUP (file_in IN VARCHAR2);
+END fileio92;
+/
+
+CREATE OR REPLACE PACKAGE BODY fileio92
+IS
+   g_source_dir    VARCHAR2 (2000);
+   g_archive_dir   VARCHAR2 (2000);
+
+   TYPE fgetattr_t IS RECORD (
+      fexists       BOOLEAN
+     ,file_length   PLS_INTEGER
+     ,block_size    PLS_INTEGER
+   );
+
+   -- Glasgow 9/2003: remove calls to dbms_output.put_line
+   PROCEDURE pl (
+      str         IN   VARCHAR2
+     ,len         IN   INTEGER := 80
+     ,expand_in   IN   BOOLEAN := TRUE
+   )
+   IS
+      v_len     PLS_INTEGER     := LEAST (len, 255);
+      v_len2    PLS_INTEGER;
+      v_chr10   PLS_INTEGER;
+      v_str     VARCHAR2 (2000);
+   BEGIN
+      IF LENGTH (str) > v_len
+      THEN
+         v_chr10 := INSTR (str, CHR (10));
+
+         IF v_chr10 > 0 AND v_len < v_chr10
+         THEN
+            v_len := v_chr10 - 1;
+            v_len2 := v_chr10 + 1;
+         ELSE
+            v_len := v_len - 1;
+            v_len2 := v_len;
+         END IF;
+
+         v_str := SUBSTR (str, 1, v_len);
+         pl (v_str);
+         pl (SUBSTR (str, v_len2), len, expand_in);
+      ELSE
+         pl (str);
+      END IF;
+   EXCEPTION
+      WHEN OTHERS
+      THEN
+         /* TVP 9/99: Might want to use buffer size to STOP program */
+         IF expand_in
+         THEN
+            DBMS_OUTPUT.ENABLE (1000000);
+            pl (v_str);
+         ELSE
+            RAISE;
+         END IF;
+   END;
+
+   FUNCTION dir_available (dir_in IN VARCHAR2, uppercase_in IN BOOLEAN := TRUE)
+      RETURN BOOLEAN
+   IS
+      v_dir    VARCHAR2 (100) := dir_in;
+      retval   BOOLEAN;
+      dummy    CHAR (1);
+   BEGIN
+      IF uppercase_in
+      THEN
+         v_dir := UPPER (v_dir);
+      END IF;
+
+      SELECT 'x'
+        INTO dummy
+        FROM all_directories
+       WHERE directory_name = v_dir;
+
+      RETURN TRUE;
+   EXCEPTION
+      WHEN NO_DATA_FOUND
+      THEN
+         RETURN FALSE;
+   END dir_available;
+
+   PROCEDURE validate_directory (
+      dir_in         IN   VARCHAR2
+     ,uppercase_in   IN   BOOLEAN := TRUE
+   )
+   IS
+   BEGIN
+      IF dir_available (dir_in, uppercase_in)
+      THEN
+         NULL;
+      ELSE
+         pl ('Undefined directory: "' || dir_in || '"');
+         pl ('Use CREATE DIRECTORY statement to define this directory.');
+         pl ('Then you will be able to use it with UTL_FILE.');
+         RAISE UTL_FILE.invalid_path;
+      END IF;
+   END validate_directory;
+
+   PROCEDURE show_directories
+   IS
+   BEGIN
+      pl ('Defined and Available Directories:');
+
+      FOR rec IN (SELECT *
+                    FROM all_directories)
+      LOOP
+         pl (rec.owner || '.' || rec.directory_name || ' = '
+             || rec.directory_path
+            );
+      END LOOP;
+   END show_directories;
+
+   PROCEDURE fremove (
+      file_in          IN       VARCHAR2
+     ,dir_in           IN       VARCHAR2
+     ,result_out       OUT      INTEGER
+     ,show_result_in   IN       BOOLEAN := FALSE
+   )
+   IS
+   BEGIN
+      UTL_FILE.fremove (LOCATION => dir_in, filename => file_in);
+
+      IF show_result_in
+      THEN
+         pl ('Successfully removed: ' || file_in || ' from ' || dir_in);
+      END IF;
+
+      result_out := c_success;
+   EXCEPTION
+      -- If you call FREMOVE, you should check explicitly
+      -- for deletion failures.
+      WHEN UTL_FILE.delete_failed
+      THEN
+         IF show_result_in
+         THEN
+            pl ('Error attempting to remove: ' || file_in || ' from '
+                || dir_in
+               );
+         END IF;
+
+         result_out := c_not_removeable;
+      -- If file is not found, then a different error is raised
+      WHEN UTL_FILE.invalid_operation
+      THEN
+         IF show_result_in
+         THEN
+            pl ('Unable to find and remove: ' || file_in || ' from ' || dir_in
+               );
+         END IF;
+
+         result_out := c_file_not_found;
+   END fremove;
+
+   FUNCTION flength (dir_in IN VARCHAR2, file_in IN VARCHAR2)
+      RETURN PLS_INTEGER
+   IS
+      fgetattr_rec   fgetattr_t;
+   BEGIN
+      UTL_FILE.fgetattr (LOCATION         => dir_in
+                        ,filename         => file_in
+                        ,fexists          => fgetattr_rec.fexists
+                        ,file_length      => fgetattr_rec.file_length
+                        ,block_size       => fgetattr_rec.block_size
+                        );
+      RETURN fgetattr_rec.file_length;
+   END flength;
+
+   FUNCTION fexists (dir_in IN VARCHAR2, file_in IN VARCHAR2)
+      RETURN BOOLEAN
+   IS
+      fgetattr_rec   fgetattr_t;
+   BEGIN
+      UTL_FILE.fgetattr (LOCATION         => dir_in
+                        ,filename         => file_in
+                        ,fexists          => fgetattr_rec.fexists
+                        ,file_length      => fgetattr_rec.file_length
+                        ,block_size       => fgetattr_rec.block_size
+                        );
+
+      -- Bug #2240685. fexists is always returned TRUE
+       -- But non-existent file has ZERO file_length and block_size
+      IF fgetattr_rec.file_length = 0 AND fgetattr_rec.block_size = 0
+      THEN
+         RETURN FALSE;
+      ELSE
+         RETURN TRUE;
+      END IF;
+   -- Copenhagen 10/2003
+   -- Or use this simpler formulation:
+
+   --RETURN (   fgetattr_rec.file_length != 0
+   --        OR fgetattr_rec.block_size != 0
+   --      );
+
+   -- 11/2002 Dublin
+   -- When the bug is fixed, comment OUT the above
+   -- and uncomment this:
+   -- RETURN fgetattr_rec.fexists;
+   END fexists;
+
+   FUNCTION fexists_wa (dir_in IN VARCHAR2, file_in IN VARCHAR2)
+      RETURN BOOLEAN
+   IS
+      fgetattr_rec   fgetattr_t;
+   BEGIN
+      UTL_FILE.fgetattr (LOCATION         => dir_in
+                        ,filename         => file_in
+                        ,fexists          => fgetattr_rec.fexists
+                        ,file_length      => fgetattr_rec.file_length
+                        ,block_size       => fgetattr_rec.block_size
+                        );
+      -- Bug #2174036. fexists is always returned TRUE
+       -- But non-existent file has ZERO file_length and block_size
+      DBMS_OUTPUT.put_line ('file length = ' || fgetattr_rec.file_length);
+      DBMS_OUTPUT.put_line ('block size = ' || fgetattr_rec.block_size);
+
+      IF fgetattr_rec.file_length = 0 AND fgetattr_rec.block_size = 0
+      THEN
+         RETURN FALSE;
+      ELSE
+         RETURN TRUE;
+      END IF;
+   -- Copenhagen 10/2003
+   -- Or use this simpler formulation:
+
+   --RETURN (   fgetattr_rec.file_length != 0
+   --        OR fgetattr_rec.block_size != 0
+   --      );
+
+   -- 11/2002 Dublin
+   -- When the bug is fixed, comment OUT the above
+   -- and uncomment this:
+   -- RETURN fgetattr_rec.fexists;
+   END fexists_wa;
+
+   PROCEDURE chgext (
+      dir_in           IN       VARCHAR2
+     ,file_in          IN       VARCHAR2
+     ,newext_in        IN       VARCHAR2
+     ,result_out       OUT      INTEGER
+     ,delim_in         IN       VARCHAR2 := '.'
+     ,show_result_in   IN       BOOLEAN := FALSE
+   )
+   IS
+      -- Find the last occurrence of the delimiter.
+      l_dot_loc   PLS_INTEGER := INSTR (file_in, delim_in, -1, 1);
+   BEGIN
+      IF l_dot_loc = 0
+      THEN
+         result_out := c_no_extension;
+      ELSE
+         UTL_FILE.frename (src_location       => dir_in
+                          ,src_filename       => file_in
+                          ,dest_location      => dir_in
+                          ,dest_filename      =>    SUBSTR (file_in
+                                                           ,1
+                                                           , l_dot_loc - 1
+                                                           )
+                                                 || delim_in
+                                                 || newext_in
+                          ,overwrite          => FALSE
+                          );
+         result_out := c_success;
+      END IF;
+   EXCEPTION
+      WHEN UTL_FILE.rename_failed
+      THEN
+         IF show_result_in
+         THEN
+            pl ('Error attempting to rename: ' || file_in || ' from '
+                || dir_in
+               );
+         END IF;
+
+         result_out := c_not_renameable;
+         UTL_FILE.fclose_all;
+      WHEN UTL_FILE.invalid_operation
+      THEN
+         IF show_result_in
+         THEN
+            pl ('Unable to find and rename: ' || file_in || ' from ' || dir_in
+               );
+         END IF;
+
+         UTL_FILE.fclose_all;
+         result_out := c_file_not_found;
+   END chgext;
+
+   -- Easy backup functionality.
+   PROCEDURE set_backup_dirs (
+      source_dir_in      IN   VARCHAR2
+     ,archive_dir_in     IN   VARCHAR2
+     ,validate_dirs_in   IN   BOOLEAN := TRUE
+   )
+   IS
+   BEGIN
+      IF validate_dirs_in
+      THEN
+         validate_directory (source_dir_in);
+         validate_directory (archive_dir_in);
+      END IF;
+
+      g_source_dir := source_dir_in;
+      g_archive_dir := archive_dir_in;
+   END set_backup_dirs;
+
+   FUNCTION source_dir
+      RETURN VARCHAR2
+   IS
+   BEGIN
+      RETURN g_source_dir;
+   END source_dir;
+
+   FUNCTION archive_dir
+      RETURN VARCHAR2
+   IS
+   BEGIN
+      RETURN g_archive_dir;
+   END archive_dir;
+
+   PROCEDURE BACKUP (file_in IN VARCHAR2)
+   IS
+   BEGIN
+      UTL_FILE.fcopy (src_location       => g_source_dir
+                     ,src_filename       => file_in
+                     ,dest_location      => g_archive_dir
+                     ,dest_filename      => file_in
+                     );
+   END BACKUP;
+END fileio92;
+/
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

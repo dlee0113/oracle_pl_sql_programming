@@ -1,0 +1,87 @@
+CREATE OR REPLACE PACKAGE utl_file_constants
+IS
+   SUBTYPE max_linesize_t IS VARCHAR2 (32767);
+   SUBTYPE def_linesize_t IS VARCHAR2 (1024);
+
+   FUNCTION read_only
+      RETURN VARCHAR2;
+
+   FUNCTION write_only
+      RETURN VARCHAR2;
+
+   FUNCTION append
+      RETURN VARCHAR2;
+
+   FUNCTION min_linesize
+      RETURN PLS_INTEGER;
+
+   FUNCTION max_linesize
+      RETURN PLS_INTEGER;
+
+   FUNCTION def_linesize
+      RETURN PLS_INTEGER;
+END utl_file_constants;
+/
+
+CREATE OR REPLACE PACKAGE BODY utl_file_constants
+IS
+   c_read_only      CONSTANT VARCHAR2 (1) := 'R';
+   c_write_only     CONSTANT VARCHAR2 (1) := 'W';
+   c_append         CONSTANT VARCHAR2 (1) := 'A';
+   c_min_linesize   CONSTANT PLS_INTEGER  := 1;
+   c_def_linesize   CONSTANT PLS_INTEGER  := 1024;
+   c_max_linesize   CONSTANT PLS_INTEGER  := 65335;
+
+   FUNCTION read_only
+      RETURN VARCHAR2
+   IS
+   BEGIN
+      RETURN c_read_only;
+   END read_only;
+
+   FUNCTION write_only
+      RETURN VARCHAR2
+   IS
+   BEGIN
+      RETURN c_write_only;
+   END write_only;
+
+   FUNCTION append
+      RETURN VARCHAR2
+   IS
+   BEGIN
+      RETURN c_append;
+   END append;
+
+   FUNCTION min_linesize
+      RETURN PLS_INTEGER
+   IS
+   BEGIN
+      RETURN c_min_linesize;
+   END min_linesize;
+
+   FUNCTION def_linesize
+      RETURN PLS_INTEGER
+   IS
+   BEGIN
+      RETURN c_def_linesize;
+   END def_linesize;
+
+   FUNCTION max_linesize
+      RETURN PLS_INTEGER
+   IS
+   BEGIN
+      RETURN c_max_linesize;
+   END max_linesize;
+END utl_file_constants;
+/
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/
+

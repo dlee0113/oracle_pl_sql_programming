@@ -1,0 +1,101 @@
+create or replace PACKAGE dt 
+IS
+   /* The replacement for TO_DATE */
+   FUNCTION val (value_in IN VARCHAR2) RETURN DATE;
+
+/* Note: In Oracle8i and above, you can now supply a list of
+date formats in the NLS_DATE_FORMAT parameter and it will try
+to use all of those. */
+
+END dt;
+/
+create or replace PACKAGE BODY dt 
+IS
+   /* 
+   || Declare the structure of the PL/SQL table which will hold
+   || the masks. Then declare the table itself.
+   */
+   TYPE mask_tabtype IS TABLE OF VARCHAR2 (30) INDEX BY BINARY_INTEGER;
+   fmts mask_tabtype;
+
+   fmt_count INTEGER;
+
+   FUNCTION val (value_in IN VARCHAR2) RETURN DATE
+   IS
+      retval DATE := NULL;
+
+      /* Loop index for the scan through the masks */
+      mask_index INTEGER := 1;
+
+      /* Boolean to terminate loop if date was converted */
+      date_converted BOOLEAN := FALSE;
+   BEGIN
+      /* Convert from masks in table */
+      IF value_in IS NULL
+      THEN
+         date_converted := TRUE;
+      ELSE
+         /* 09/000 TVP - Improve performance by testing with default */
+         BEGIN
+            /* Try to convert string using mask in table row */
+            retval := TO_DATE (value_in);
+            date_converted := TRUE;
+         EXCEPTION 
+            WHEN OTHERS 
+            THEN 
+               date_converted := FALSE;
+         END;
+         
+         /* Loop through the rows in the table... */
+         WHILE mask_index <= fmt_count AND NOT date_converted
+         LOOP
+            BEGIN
+               /* Try to convert string using mask in table row */
+               retval := TO_DATE (value_in, fmts (mask_index));
+               p.l ('Converting with ' || fmts (mask_index));
+               date_converted := TRUE;
+            EXCEPTION 
+               WHEN OTHERS 
+               THEN 
+                  retval := NULL;
+                  mask_index:= mask_index+ 1;
+            END;
+         END LOOP;
+      END IF;
+
+      IF date_converted
+      THEN
+         RETURN retval;
+      ELSE
+         RAISE VALUE_ERROR;
+      END IF;
+   END val;
+   
+BEGIN
+   /* ------------ Initialization Section of Package ------------*/
+   fmts(1) := 'DD-MON-RR';
+   fmts(2) := 'DD-MON-YYYY';
+   fmts(3) := 'DD-MON';
+   fmts(4) := 'MM/DD';
+   fmts(5) := 'MM/RR';
+   fmts(6) := 'MMDDRR';
+   fmts(7) := 'MM/YYYY';
+   fmts(8) := 'MM/DD/RR';
+   fmts(9) := 'MM/DD/YYYY';
+   fmts(10) := 'MMDDYYYY';
+   fmts(11) := 'YYYYMMDD';
+   fmts(12) := 'RRMMDD';
+   fmt_count := 12;
+      
+END dt;
+/
+
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

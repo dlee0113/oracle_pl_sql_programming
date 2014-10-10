@@ -1,0 +1,27 @@
+CREATE OR REPLACE FUNCTION tabCount (
+   tab IN VARCHAR2,
+   whr IN VARCHAR2 := NULL,
+   sch IN VARCHAR2 := NULL)
+   RETURN INTEGER
+IS
+   retval INTEGER;
+BEGIN
+   EXECUTE IMMEDIATE
+      'SELECT COUNT(*) 
+         FROM ' || NVL (sch, USER) || '.' || tab ||
+      ' WHERE ' || NVL (whr, '1=1')
+      INTO retval;
+   RETURN retval;
+END;
+/
+
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/
+

@@ -1,0 +1,2268 @@
+<html>
+<head>
+<meta http-equiv=Content-Type content="text/html; charset=windows-1252">
+<title>Oracle PL/SQL Programming Supplemental Files</title>
+</head>
+<body lang=EN-US bgcolor="#FFFFFF">
+   
+<table border=1 cellspacing=0 cellpadding=0>
+   <tr> 
+      <td bgcolor="#000000"> 
+         <p><b><FONT color="#FFFFFF">File Name</FONT></b> 
+      </td>
+      <td bgcolor="#000000"> 
+         <p><b><FONT color="#FFFFFF">Chapter</FONT></b> 
+      </td>
+      <td bgcolor="#000000"> 
+         <p><b><FONT color="#FFFFFF">Description</FONT></b> 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p>daternge.sf</p>
+      </td>
+      <td> WEB </td>
+      <td> 
+         <p>Generates a date range string to append to SQL statements </p>
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p><a href="ftp://elsie.nci.nih.gov/pub/ ">ftp://elsie.nci.nih.gov/pub/</a> 
+      </td>
+      <td>&nbsp;</td>
+      <td> 
+         <p> The source for the time zone region definitions that Oracle uses. Look 
+            particularly at tzdata2002c.tar.gz. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> insert_books.sql 
+      </td>
+      <td> 
+         <p> 2+ 
+      </td>
+      <td> 
+         <p> Insert various rows into the books table 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> bulktiming.sql 
+      </td>
+      <td> 
+         <p> 1 
+      </td>
+      <td> 
+         <p> Performs timing comparisons between bulk processing (FORALL and BULK 
+            COLLECT) and row-by-row processing 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> oneversion.sql 
+      </td>
+      <td> 
+         <p> 1 
+      </td>
+      <td> 
+         <p> Demonstration of a technique using SQL*Plus substitution parameters 
+            for maintaining multiple sets of code in a single file 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> books.tab 
+      </td>
+      <td> 
+         <p> 2 
+      </td>
+      <td> 
+         <p> CREATE TABLE statement for books table used in Chapter 2. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> booktitle.fun 
+      </td>
+      <td> 
+         <p> 2 
+      </td>
+      <td> 
+         <p> Function that retrieves a book’s title by its ISBN. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> callbooktitle.java 
+      </td>
+      <td> 
+         <p> 2 
+      </td>
+      <td> 
+         <p> Java version of program that calls the PL/SQL booktitle function. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> callbooktitle.pc 
+      </td>
+      <td> 
+         <p> 2 
+      </td>
+      <td> 
+         <p> Pro*C version of program that calls the PL/SQL booktitle function. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> callbooktitle.pl 
+      </td>
+      <td> 
+         <p> 2 
+      </td>
+      <td> 
+         <p> Perl version of program that calls the PL/SQL booktitle function. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> favorite_plsql_book.psp 
+      </td>
+      <td> 
+         <p> 2 
+      </td>
+      <td> 
+         <p> PL/SQL Server Pages version of program that calls the PL/SQL booktitle 
+            function. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> reserved.txt 
+      </td>
+      <td> 
+         <p> 2 
+      </td>
+      <td> 
+         <p> Absolute minimal list of words to avoid using as PL/SQL identifiers 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> wordcount.fun 
+      </td>
+      <td> 
+         <p> 2 
+      </td>
+      <td> 
+         <p> Function to count the number of words in an input string 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> README_vim.txt 
+      </td>
+      <td> 
+         <p> 3 
+      </td>
+      <td> 
+         <p> Instructions for setting up the free &quot;vim&quot; editor with support 
+            for PL/SQL syntax highlighting and automatic indentation 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch04_case01.sql 
+      </td>
+      <td> 
+         <p> 4 
+      </td>
+      <td> 
+         <p> Simple CASE statement solution to the bonus problem. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch04_case02.sql 
+      </td>
+      <td> 
+         <p> 4 
+      </td>
+      <td> 
+         <p> Searched CASE solution to the bonus problem. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch04_case03.sql 
+      </td>
+      <td> 
+         <p> 4 
+      </td>
+      <td> 
+         <p> Simple CASE expression example, using boolean_to_varchar2. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch04_case04.sql 
+      </td>
+      <td> 
+         <p> 4 
+      </td>
+      <td> 
+         <p> Searched CASE expression solution to bonus problem. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch04_if01.sql 
+      </td>
+      <td> 
+         <p> 4 
+      </td>
+      <td> 
+         <p> IF-THEN-ELSIF example using the BETWEEN predicate, and demonstrating 
+            what happens when both an IF and an ELSIF evaluate to true. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch04_if02.sql 
+      </td>
+      <td> 
+         <p> 4 
+      </td>
+      <td> 
+         <p> Same as ch04_if01.sql, but eliminates the overlap between conditions. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch04_if03.sql 
+      </td>
+      <td> 
+         <p> 4 
+      </td>
+      <td> 
+         <p>Demonstrates the effects of NULLs in IF  statements. Taken from the sidebar 
+            on that topic in Chapter 4.</p>
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch05.zip 
+      </td>
+      <td> 
+         <p> 5 
+      </td>
+      <td> 
+         <p> Zip of scripts testing code listings in Chapter 5 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> datemgr.pkg 
+      </td>
+      <td> 
+         <p> 5 
+      </td>
+      <td> 
+         <p> Replacement for TO_DATE that avoids the need to provide a format mask 
+            by trying a series of formats all stored in a collections. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> errpkg.pkg 
+      </td>
+      <td> 
+         <p> 6 
+      </td>
+      <td> 
+         <p> Working prototype of a generic error handling and raising package. The 
+            PL/Vision vision package, PLVexc, offers a much more robust implementation. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> msginfo.pkg 
+      </td>
+      <td> 
+         <p> 6 
+      </td>
+      <td> 
+         <p> Generic message table and supporting package, with a specific application 
+            for error message management. It even generates an error package with 
+            named constants for pre-defined application specific errors. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> raise_by_language.sp 
+      </td>
+      <td> 
+         <p> 6 
+      </td>
+      <td> 
+         <p> Shows how to use v$nls_parameter and multiple language error message 
+            table to pass back language-appropriate error messages 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> aq.pkg 
+      </td>
+      <td> 
+         <p> 7 
+      </td>
+      <td> 
+         <p> Package to make it easier to use the Oracle Advanced Queuing utility 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> cast.sql 
+      </td>
+      <td> 
+         <p> 7 
+      </td>
+      <td> 
+         <p> Demonstration of CAST operator to reference/manipulate PL/SQL-based 
+            collections from within an SQL statement 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> betwnstr.sf 
+      </td>
+      <td> 
+         <p> 8 
+      </td>
+      <td> 
+         <p> Function that offers a spin on SUBSTR: returns the sub-string between 
+            start and end locations 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch08_blankpadding.sql 
+      </td>
+      <td> 
+         <p> 8 
+      </td>
+      <td> 
+         <p> Shows the difference between blank-padded stringcomparisions and non-blank-padded 
+            string comparisions. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch08_emptyisnull.sql 
+      </td>
+      <td> 
+         <p> 8 
+      </td>
+      <td> 
+         <p> Demonstrates that empty strings are NULL. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch08_instr_unicode.sql 
+      </td>
+      <td> 
+         <p> 8 
+      </td>
+      <td> 
+         <p> The four Unicode-related examples of the built-in INSTR function. Check 
+            comments in file before executing these examples. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch08_isfixed01.sql 
+      </td>
+      <td> 
+         <p> 8 
+      </td>
+      <td> 
+         <p>Code example from the &quot;Is Fixed-Length Really Fixed?&quot; sidebar. 
+            Check comments in file before executing this example.</p>
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch08_to_multi_byte.sql 
+      </td>
+      <td> 
+         <p> 8 
+      </td>
+      <td> 
+         <p>The example for the built-in TO_MULTI_BYTE function. Check comments in 
+            the file before executing this example.</p>
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> <a href="http://unicode.org">http://unicode.org</a> 
+      </td>
+      <td> 
+         <p> 8 
+      </td>
+      <td> 
+         <p><span> </span>Definitive source for information on Unicode (UTF-8, UTF-16, 
+            etc).</p>
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> <a href="http://www.unicode.org/charts/">http://www.unicode.org/charts/</a> 
+      </td>
+      <td> 
+         <p> 8 
+      </td>
+      <td> 
+         <p> The place to go to look up the value for a Unicode code point. 
+      </td>
+   </tr>
+   <tr> 
+      <td> <a href="http://www.unicode.org/charts/PDF/U1D100.pdf">http://www.unicode.org/charts/PDF/U1D100.pdf</a> 
+      </td>
+      <td> 
+         <p> 8 
+      </td>
+      <td> 
+         <p> The Unicode encoding chart that happens to show the musical G clef character 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch10_addmonths.sql 
+      </td>
+      <td> 
+         <p> 10 
+      </td>
+      <td> 
+         <p>Code from the &quot;Getting Around ADD_MONTH's Month-end Quirk&quot; 
+            sidebar.</p>
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch10_cast.sql 
+      </td>
+      <td> 
+         <p> 10 
+      </td>
+      <td> 
+         <p> CAST examples 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch10_datetime_literals.sql 
+      </td>
+      <td> 
+         <p> 10 
+      </td>
+      <td> 
+         <p> Demonstrates various date and timestamp literals. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch10_goodfor.sql 
+      </td>
+      <td> 
+         <p> 10 
+      </td>
+      <td> 
+         <p> The INTERVAL example involving the good_for table. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch10_intervals01.sql 
+      </td>
+      <td> 
+         <p> 10 
+      </td>
+      <td> 
+         <p> Interval value expressions 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch10_intervals02.sql 
+      </td>
+      <td> 
+         <p> 10 
+      </td>
+      <td> 
+         <p> More examples of interval arithmetic 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch10_intervals03.sql 
+      </td>
+      <td> 
+         <p> 10 
+      </td>
+      <td> 
+         <p> Adding and subtracting intervals 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch10_intervals04.sql 
+      </td>
+      <td> 
+         <p> 10 
+      </td>
+      <td> 
+         <p> Multiplying and dividing intervals 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch10_lengthofservice.sql 
+      </td>
+      <td> 
+         <p> 10 
+      </td>
+      <td> 
+         <p> The length of service interval example. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch10_round.sql 
+      </td>
+      <td> 
+         <p> 10 
+      </td>
+      <td> 
+         <p> Examples of rounding date values using ROUND. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch10_timezones01.sql 
+      </td>
+      <td> 
+         <p> 10 
+      </td>
+      <td> 
+         <p> The example of converting time zones to character strings. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch10_trunc.sql 
+      </td>
+      <td> 
+         <p> 10 
+      </td>
+      <td> 
+         <p> Examples of truncating date values using TRUNC. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch10_unconstrained.sql 
+      </td>
+      <td> 
+         <p> 10 
+      </td>
+      <td> 
+         <p> All the unconstrained interval examples 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> <a href="http://aa.usno.navy.mil/faq/docs/UT.html">http://aa.usno.navy.mil/faq/docs/UT.html</a> 
+      </td>
+      <td> 
+         <p> 10 
+      </td>
+      <td> 
+         <p> &quot;What is Universal Time?&quot;, a useful article for anyone wanting 
+            to learn about UTC 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> <a href="http://physics.nist.gov/GenInt/Time/world.html">http://physics.nist.gov/GenInt/Time/world.html</a> 
+      </td>
+      <td> 
+         <p> 10 
+      </td>
+      <td> 
+         <p> Another useful web page on UTC. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> <a href="http://www.boulder.nist.gov/timefreq/general/misc.htm#Anchor_14550">http://www.boulder.nist.gov/timefreq/general/misc.htm#Anchor_14550</a> 
+      </td>
+      <td> 
+         <p> 10 
+      </td>
+      <td> 
+         <p> Why the acronym for Coordinated Universal Time is UTC rather than CUT. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> showdaterange.sql 
+      </td>
+      <td> 
+         <p> 10 
+      </td>
+      <td> 
+         <p> Verifies actual valid range for dates in your installation of Oracle 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> altind.pkg, altind.tst 
+      </td>
+      <td> 
+         <p> 11 
+      </td>
+      <td> 
+         <p> Implementation of an alternative, hash-based index for collections, 
+            including conflict resolution employing a linear probe algorithm. Most 
+            useful prior to Oracle9i R2 and the advent of VARCHAR2-indexed collections 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> assoc_array.sql 
+      </td>
+      <td> 
+         <p> 11 
+      </td>
+      <td> 
+         <p> Example of VARCHAR2-indexed associative array. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> bidir.pkg 
+      </td>
+      <td> 
+         <p> 11 
+      </td>
+      <td> 
+         <p> Demonstration of use of collections to emulate bi-directional (random 
+            access) cursors 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> coll_order.sql 
+      </td>
+      <td> 
+         <p> 11 
+      </td>
+      <td> 
+         <p> Demonstration of TABLE operator to order contents in PL/SQL collections 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> favorites.sql 
+      </td>
+      <td> 
+         <p> 11 
+      </td>
+      <td> 
+         <p> Demonstration of use of collections and cursor variables 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> gen_multcoll.sp 
+      </td>
+      <td> 
+         <p> 11 
+      </td>
+      <td> 
+         <p> Generates multi-level collections to determine how many levels of nesting 
+            is supported by PL/SQL 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> gen_record_comparison.pkg 
+      </td>
+      <td> 
+         <p> 11 
+      </td>
+      <td> 
+         <p> Generates code needed to compare two records that have the same structure 
+            (%ROWTYPE) as the specified table 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> genaa.sp 
+      </td>
+      <td> 
+         <p> 11 
+      </td>
+      <td> 
+         <p> Generates a package containing useful associative arrays for the specified 
+            database table. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> justonce.sql 
+      </td>
+      <td> 
+         <p> 11 
+      </td>
+      <td> 
+         <p> Demonstration of using collections to cache data for queries of static 
+            data, guaranteeing that the data is only queried once in a session 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> multilevel_collections1.sql 
+      </td>
+      <td> 
+         <p> 11 
+      </td>
+      <td> 
+         <p> Demonstrate of Oracle9i Release 2 multi-level collection capabilities. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> multilevel_collections2.sql 
+      </td>
+      <td> 
+         <p> 11 
+      </td>
+      <td> 
+         <p> Demonstrate of Oracle9i Release 2 multi-level collection capabilities. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> mytodate.sf 
+      </td>
+      <td> 
+         <p> 11 
+      </td>
+      <td> 
+         <p> Replacement for TO_DATE that avoids the need to provide a format mask 
+            by trying a series of formats all stored in a collections. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> object_collection.sql 
+      </td>
+      <td> 
+         <p> 11 
+      </td>
+      <td> 
+         <p> Example of object type containing an attribute that is a collection 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> anynums.pkg, <br>
+            anynums.tst 
+      </td>
+      <td> 
+         <p> 12 
+      </td>
+      <td> 
+         <p> Package that demonstrates use of the new ANYTYPE datatype to dynamically 
+            determine if the data inside an ANYTYPE column (in the wild_side table) 
+            is numeric. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch12_anydata.sql 
+      </td>
+      <td> 
+         <p> 12 
+      </td>
+      <td> 
+         <p> Demonstrates the use of SYS.AnyData. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch12_bfile01.sql 
+      </td>
+      <td> 
+         <p> 12 
+      </td>
+      <td> 
+         <p> Create a BFILE locator and access the data in the BFILE. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch12_bfile02.sql 
+      </td>
+      <td> 
+         <p> 12 
+      </td>
+      <td> 
+         <p> Use a BFILE and the DBMS_LOB.LOADCLOBFROMFILE function to load data 
+            into a LOB column. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch12_clob01.sql 
+      </td>
+      <td> 
+         <p> 12 
+      </td>
+      <td> 
+         <p> Shows the difference between an empty LOB and NULL LOB. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch12_clob02.sql 
+      </td>
+      <td> 
+         <p> 12 
+      </td>
+      <td> 
+         <p> Writing directions for Munising Falls into a CLOB 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch12_clob03.sql 
+      </td>
+      <td> 
+         <p> 12 
+      </td>
+      <td> 
+         <p> Read back the directions that ch12_clob02.sql wrote to the waterfalls 
+            table. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch12_sql_semantics.sql 
+      </td>
+      <td> 
+         <p> 12 
+      </td>
+      <td> 
+         <p> Shows various examples of SQL semantics being applied to CLOB values. 
+            Be sure to run ch12_clob02.sql first in order to populate the waterfalls 
+            table with the data read by this example. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch12_uritype.sql 
+      </td>
+      <td> 
+         <p> 12 
+      </td>
+      <td> 
+         <p> This is the HttpUriType example. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch12_urowid.sql 
+      </td>
+      <td> 
+         <p> 12 
+      </td>
+      <td> 
+         <p> The two UROWID-related examples 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch12_waterfalls.sql 
+      </td>
+      <td> 
+         <p> 12 
+      </td>
+      <td> 
+         <p> Creates the waterfalls table, and other objects used for all the LOB 
+            examples. READ COMMENTS IN FILE FIRST! 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch12_xml01.sql 
+      </td>
+      <td> 
+         <p> 12 
+      </td>
+      <td> 
+         <p>Create and populate the falls table used in the  XMLType examples.</p>
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch12_xml02.sql 
+      </td>
+      <td> 
+         <p> 12 
+      </td>
+      <td> 
+         <p> Extract and display the URL for Munising Falls. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> Tannery Falls.htm 
+      </td>
+      <td> 
+         <p> 12 
+      </td>
+      <td> 
+         <p>HTML file used by the examples of creating BFILE locators and of accessing 
+            BFILEs.</p>
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> TanneryFalls.directions 
+      </td>
+      <td> 
+         <p>12 </p>
+      </td>
+      <td> 
+         <p> Used by the example in which a BFILE is used to load data into a LOB 
+            column. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> autondlock.sql 
+      </td>
+      <td> 
+         <p> 13 
+      </td>
+      <td> 
+         <p> Demonstration of how a deadlock can occur when working with autonomous 
+            transactions 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> autonfail.sql, <br>
+            autonfail2.sql 
+      </td>
+      <td> 
+         <p> 13 
+      </td>
+      <td> 
+         <p> Simple demonstrations of what happens when you do not make sure to COMMIT 
+            or ROLLBACK at each exit point of an autonomous transaction. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> autonserial.sql 
+      </td>
+      <td> 
+         <p> 13 
+      </td>
+      <td> 
+         <p> Demonstration of the impact of the request to serialize visibility of 
+            committed transactions when working with autonomous transactions 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> autontrigger.sql,<br>
+            autontrigger2.sql, 
+         <p> autontrigger3.sql 
+      </td>
+      <td> 
+         <p> 13 
+      </td>
+      <td> 
+         <p> Demonstration of impact of autonomous transactions with database triggers 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> books.tab 
+      </td>
+      <td> 
+         <p> 13 
+      </td>
+      <td> 
+         <p> CREATE TABLE statement for books table. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> bulkexc.sql 
+      </td>
+      <td> 
+         <p> 13 
+      </td>
+      <td> 
+         <p> Demonstration of SAVE EXCEPTION syntax to perform enhanced error handling 
+            with the FORALL statement (Oracle9i Release 2 only) 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> diffcount.sql 
+      </td>
+      <td> 
+         <p> 13 
+      </td>
+      <td>&nbsp; </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> log.pkg,<br>
+            loga.tst,  logb.tst, logc.tst,</p>
+      </td>
+      <td> 
+         <p> 13 
+      </td>
+      <td> 
+         <p> Logging package used autonomous transactions, and scripts to test the 
+            functionality 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> retry.pkg, retry.tst 
+      </td>
+      <td> 
+         <p> 13 
+      </td>
+      <td> 
+         <p> Demonstrates use of autonomous transactions to implement a &quot;three 
+            strikes and you're out&quot; mechanism to access resources 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> trcfunc.sql 
+      </td>
+      <td> 
+         <p> 13 
+      </td>
+      <td> 
+         <p> Demonstration deploying a trace function built as an autonomous transaction 
+            for use within queries 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> onlyfair.sql 
+      </td>
+      <td> 
+         <p> 14 
+      </td>
+      <td> 
+         <p> Demonstration of FORALL with BULK COLLECT 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> countby.pkg, <br>
+            countby.sp, <br>
+            countby.tst 
+      </td>
+      <td> 
+         <p> 15 
+      </td>
+      <td> 
+         <p> Programs that utilize dynamic SQL to compute COUNTs for the specified 
+            column in a table, with option HAVING clause. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> desccols.pkg 
+      </td>
+      <td> 
+         <p> 15 
+      </td>
+      <td> 
+         <p> A utility built on the DESCRIBE_COLUMNS procedure of the DBMS_SQL package 
+            that returns column information about the specified cursor 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> dyncalc.pkg, dyncalc.sf 
+      </td>
+      <td> 
+         <p> 15 
+      </td>
+      <td> 
+         <p> Example of performing dynamic PL/SQL: a dynamic calculator that will 
+            execute the specified function with parameters. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> dynplsql.sp 
+      </td>
+      <td> 
+         <p> 15 
+      </td>
+      <td> 
+         <p> Simple encapsulation of dynamic PL/SQL with EXECUTE IMMEDIATE. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> dynvar.pkg 
+      </td>
+      <td> 
+         <p> 15 
+      </td>
+      <td> 
+         <p> Package that implements &quot;indirect referencing&quot; (a la COPY 
+            and NAME_IN of Oracle Forms) for PL/SQL packaged variables. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> execddl.sp 
+      </td>
+      <td> 
+         <p> 15 
+      </td>
+      <td> 
+         <p> Simple encapsulation of EXECUTE IMMEDIATE (to execute a DDL statement) 
+            that demonstrates proper error handling procedure. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> filepath.pkg 
+      </td>
+      <td> 
+         <p> 15 
+      </td>
+      <td> 
+         <p> Package that allows you to define and use paths when opening files with 
+            UTL_FILE. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> filepath1.pkg 
+      </td>
+      <td> 
+         <p> 15 
+      </td>
+      <td> 
+         <p> Version of filepath package that relies on dynamic PL/SQL (the str2list 
+            package) to parse the directory list. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> health$.pkg 
+      </td>
+      <td> 
+         <p> 15 
+      </td>
+      <td> 
+         <p> Demonstration of row level security, makes extensive use of dynamic 
+            SQL 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ndsutil.pkg 
+      </td>
+      <td> 
+         <p> 15 
+      </td>
+      <td> 
+         <p> Single utility package that leverages Native Dynamic SQL to perform 
+            a variety of operations 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> run9am.sp 
+      </td>
+      <td> 
+         <p> 15 
+      </td>
+      <td> 
+         <p> Demonstration of dynamic PL/SQL 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> showcol.sp 
+      </td>
+      <td> 
+         <p> 15 
+      </td>
+      <td> 
+         <p> Utility that relies on native dynamic SQL to allow to view the WHERE-restricted 
+            contents of any column in any table. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> showdtcol.sp 
+      </td>
+      <td> 
+         <p> 15 
+      </td>
+      <td> 
+         <p> Utility that relies on native dynamic SQL to allow to view the WHERE-restricted 
+            contents of any date column in any table. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> str2list.pkg 
+      </td>
+      <td> 
+         <p> 15 
+      </td>
+      <td> 
+         <p> Generic package that will parse any delimited string and deposit the 
+            parsed elements into your very own collection 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> tabcount.sf 
+      </td>
+      <td> 
+         <p> 15 
+      </td>
+      <td> 
+         <p> Dynamic SQL function that retrieves the count of rows in the specified 
+            table 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> updnval.sf 
+      </td>
+      <td> 
+         <p> 15 
+      </td>
+      <td> 
+         <p> Demonstration of the flexibility of dynamic SQL: updates any column 
+            value in the specified table 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> do.pkg 
+      </td>
+      <td> 
+         <p> 16 
+      </td>
+      <td> 
+         <p> A substitute for (built on top of) DBMS_OUTPUT.PUT_LINE that offers 
+            additional overloadings and flexibility. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> tabfunc.sql 
+      </td>
+      <td> 
+         <p> 16 
+      </td>
+      <td> 
+         <p> Demonstration of table function feature 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> xmltype.sql 
+      </td>
+      <td> 
+         <p> 16 
+      </td>
+      <td> 
+         <p> A demonstration of the use of the XMLType as a database table's column 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> custrules.pkg 
+      </td>
+      <td> 
+         <p> 17 
+      </td>
+      <td> 
+         <p> Demonstration of package with overloading to encapsulate a business 
+            rule. Notice that one overloading uses the other, so that the formula 
+            is never repeated. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> dbparm.pkg 
+      </td>
+      <td> 
+         <p> 17 
+      </td>
+      <td> 
+         <p> An encapsulation around the GET_PARAMETER_VALUE procedure of the DBMS_UTILITY 
+            package to make it easier to use. </p>
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> emplu.pkg, emplu.tst 
+      </td>
+      <td> 
+         <p> 17 
+      </td>
+      <td> 
+         <p> Scripts to demonstrate the improved retrieval perform with collections 
+            vs. an SQL query 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> fullname.pkg 
+      </td>
+      <td> 
+         <p> 17 
+      </td>
+      <td> 
+         <p> Package that demonstrates how to encapsulate business rules and formulas 
+            (&quot;construct the full name as last comma first&quot;) behind procedures 
+            and functions 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> init.pkg, init.tst 
+      </td>
+      <td> 
+         <p> 17 
+      </td>
+      <td> 
+         <p> Demonstration of a package initialization section to extract session-static 
+            information just once and cache it 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> openclose.sql 
+      </td>
+      <td> 
+         <p> 17 
+      </td>
+      <td> 
+         <p> Package that demonstrates the kind of code you will want to write to 
+            manage the opening and closing of package-level cursors 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> pkgcur.sql 
+      </td>
+      <td> 
+         <p> 17 
+      </td>
+      <td> 
+         <p> Demonstration of package-based cursors 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> serialpkg.sql 
+      </td>
+      <td> 
+         <p> 17 
+      </td>
+      <td> 
+         <p> Example of a SERIALLY_REUSABLE package.</p>
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> te_employee.pks, te_employee.pkb 
+      </td>
+      <td> 
+         <p> 17 
+      </td>
+      <td> 
+         <p> Example of comprehensive table encapsulation package 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> thisuser.pkg, thisuser.tst 
+      </td>
+      <td> 
+         <p> 17 
+      </td>
+      <td> 
+         <p> Package that caches the value returned by the USER function, and a test 
+            script to show how such a simple action can result in improved application 
+            performance 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> valerr.pkg 
+      </td>
+      <td> 
+         <p> 17 
+      </td>
+      <td> 
+         <p> Package with declaration that raises an exception; demonstrates that 
+            packages which fail to initialize are still marked as valid and initialized. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> before_vs_after.sql 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> Demonstrate firing of BEFORE and AFTER triggers 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> bowlerama_full_audit.sql 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> One trigger handling INSERT, UPDATE and DELETE operations. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> bowlerama_tables.sql 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> Create tables for DML trigger examples. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> cascade_mutation.sql 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p>Demonstration of effect  of DELETE CASCADE </p>
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch18.zip 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> Zip of scripts testing code listings in Chapter 18 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> copy_tables.sql 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> Demonstration of when statement and row level triggers fire 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> error_log.sql 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> Generic trigger to respond to Oracle Server errors 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> final_audit.sql 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> Fully specified DDL triggering including REFERENCING and WHERE clause 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> fixer.sql 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> Template of package code to automatically fix space errors trapped by 
+            AFTER SUSPEND triggers. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> full_old_and_new.sql 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> Demonstration of REFERENCING clause 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> genTrigRec.sp 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> Generates code to use in a trigger to copy NEW and OLD contents to actual 
+            PL/SQL records that can be passed as parameters to other programs 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> genWhen.sp 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> Generates a WHEN clause for each column in the specified table 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> golf_commentary.sql 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> DML trigger setting :NEW values 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> increment_extents.sql 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> AFTER SUSPEND trigger to automatically allocate storage extents if required 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> informed_town_crier.sql 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> DDL trigger showing ORA% functions 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> local_abort.sql 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> AFTER SUSPEND trigger to abort current transaction 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> multiple_trigger_seq.sql 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> Multiple DML triggers of same type 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> mutation_zone.sql 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> Package to work around mutating table error 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> no_create.sql 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> Trigger to prevent creating any objects 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> one_trigger_does_it_all.sql 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> One trigger performing INSERT, UPDATE and DELETE 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> one_trigger_per_type.sql 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> One trigger for INSERT, one for DELETE and one for UPDATE 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> overloaded_update.sql 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> Demonstration of specific column for DML UPDATE trigger 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> pizza_tables.sql 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> Create tables for INSTEAD OF trigger demonstrations 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> pizza_triggers.sql 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> INSTEAD OF trigger examples 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> preserve_app_cols.sql </p>
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> DDL ALTER trigger preventing altering certain columns 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> settrig.sp 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> Enable or disable all triggers for the specified table using dynamic 
+            DDL 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> smart_space_quota.sql 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> AFTER SUSPEND trigger to reset a users space quota if required 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> specific_error_log.sql 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> Demonstration of AFTER SERVERERROR trigger 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> statement_vs_row.sql 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> Difference between row and statement level DML triggers 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> uninformed_town_crier.sql 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> Simple DDL trigger 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> validate_score.sql 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> DML trigger used to validate record values 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p>what_column.sql 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> Schema-level trigger that traces alterations to columns 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> what_got_dropped.sql 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> Schema-level trigger that demonstrations the use of IS_DROP_COLUMN to 
+            determine if a column is being dropped.</p>
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> what_privs.sql 
+      </td>
+      <td> 
+         <p> 18 
+      </td>
+      <td> 
+         <p> Trigger that shows how to query information about privileges in an AFTER 
+            GRANT trigger 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> atleastone.sql 
+      </td>
+      <td> 
+         <p> 19 
+      </td>
+      <td> 
+         <p> Script that compares the performance of various ways to answer the question 
+            &quot;Is there at least one row satisfying my requirement?&quot; 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> psobj.sql 
+      </td>
+      <td> 
+         <p> 19 
+      </td>
+      <td> 
+         <p> Displays the list of PL/SQL stored code objects in the data dictionary 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> shownoexc.sp 
+      </td>
+      <td> 
+         <p> 19 
+      </td>
+      <td> 
+         <p> Quality control program that shows the names of all procedures and functions 
+            that do not have an exception section 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> slowest.sql 
+      </td>
+      <td> 
+         <p> 19 
+      </td>
+      <td> 
+         <p> Sample query against DBMS_PROFILER results tables to show the slowest 
+            running lines of code 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> tmr81.ot 
+      </td>
+      <td> 
+         <p> 19 
+      </td>
+      <td> 
+         <p> Elapsed time stopwatch or timer built using Oracle object types. See 
+            thisuser.tst for an example of using these timers. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> valstd.pkg 
+      </td>
+      <td> 
+         <p> 19 
+      </td>
+      <td> 
+         <p> Working prototype of a package that will scan the ALL_SOURCE data dictionary 
+            view for violations of coding standards 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> anyObject.sql 
+      </td>
+      <td> 
+         <p> 20 
+      </td>
+      <td> 
+         <p> Script demonstrating creation of a transient object type and a means 
+            of discovering the definition of a transient object type. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> authid.sql 
+      </td>
+      <td> 
+         <p> 20 
+      </td>
+      <td> 
+         <p> Script demonstrating the differences between the invoker and definer 
+            rights execution models. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ch20.sql 
+      </td>
+      <td> 
+         <p> 20 
+      </td>
+      <td> 
+         <p> Single script containing code listings and supplemental statements to 
+            demonstrate concepts in Chapter 20. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> invdef_overhead.tst 
+      </td>
+      <td> 
+         <p> 20 
+      </td>
+      <td> 
+         <p> Examination of the overhead of using invoker rights 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> invdefinv.sql, <br>
+            invdefinv.tst 
+      </td>
+      <td> 
+         <p> 20 
+      </td>
+      <td> 
+         <p> Demonstration of how definer rights takes precedence over invoker rights 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> invrole.sql 
+      </td>
+      <td> 
+         <p> 20 
+      </td>
+      <td> 
+         <p> Demonstration of how invoker rights resolution takes roles into account 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> irdynsql.sql 
+      </td>
+      <td> 
+         <p> 20 
+      </td>
+      <td> 
+         <p> Demonstration of how invoker rights works with dynamic SQL 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> recompile.sql 
+      </td>
+      <td> 
+         <p> 20 
+      </td>
+      <td> 
+         <p> Smart utility that recompiles any invalid code objects in your schema 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> runddl_dr.pro 
+      </td>
+      <td> 
+         <p> 20 
+      </td>
+      <td> 
+         <p> Definers rights version of a procedure to execute a DDL statement supplied 
+            as an input string 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> runddl_ir.pro 
+      </td>
+      <td> 
+         <p> 20 
+      </td>
+      <td> 
+         <p> Invokers rights version of a procedure to execute a DDL statement supplied 
+            as an input string 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> printany.fun 
+      </td>
+      <td> 
+         <p> 21 
+      </td>
+      <td> 
+         <p> Function to return VARCHAR2 representation of an input variable of type 
+            ANYDATA 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> DeleteFile.java, <br>
+            deletefile.sql 
+      </td>
+      <td> 
+         <p> 22 
+      </td>
+      <td> 
+         <p> Utility to delete files in specified directories that were last modified 
+            before a specified date 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> dropany.java, <br>
+            dropany.tst 
+      </td>
+      <td> 
+         <p> 22 
+      </td>
+      <td> 
+         <p> Create a program to &quot;drop anything&quot; and demonstrate the kinds 
+            of errors raised (and handled, using the getErrorInfo procedure) 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> fDelete.sf 
+      </td>
+      <td> 
+         <p> 22 
+      </td>
+      <td> 
+         <p> PL/SQL wrapper for Java delete file functionality found in JDelete.java 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> getErrorInfo.sp 
+      </td>
+      <td> 
+         <p> 22 
+      </td>
+      <td> 
+         <p> Retreives the Oracle error from a long error stack returned from Java 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> JDelete.java 
+      </td>
+      <td> 
+         <p> 22 
+      </td>
+      <td> 
+         <p> Deletes a file, used by the PL/SQL wrapper in fdelete.sf 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> JFile.java 
+      </td>
+      <td> 
+         <p> 22 
+      </td>
+      <td> 
+         <p> More comprehensive file manipulation class that can be referenced directly 
+            through simple PL/SQL wrappers (see xfile.pkg) 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> lj.bat 
+      </td>
+      <td> 
+         <p> 22 
+      </td>
+      <td> 
+         <p> Batch file to compile and then run loadjava on a Java class 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> longname.sql 
+      </td>
+      <td> 
+         <p> 22 
+      </td>
+      <td> 
+         <p> Data dictionary query to retrieve the full Java names for objects. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> myJava.pkg 
+      </td>
+      <td> 
+         <p> 22 
+      </td>
+      <td> 
+         <p> Package that shows &quot;my Java&quot; -- Java-related objects in the 
+            data dictionary 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> showjava.sp 
+      </td>
+      <td> 
+         <p> 22 
+      </td>
+      <td> 
+         <p> Utility that uses DBMS_JAVA and DBMS_LOB to display Java source</p>
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> showjava.sql 
+      </td>
+      <td> 
+         <p> 22 
+      </td>
+      <td> 
+         <p> SQL query that lists the Java objects stored in the database 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> ssoo.sql 
+      </td>
+      <td> 
+         <p> 22 
+      </td>
+      <td> 
+         <p> Shorthand SQL*Plus script for SET SERVEROUTPUT ON 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> utlcmd.sql 
+      </td>
+      <td> 
+         <p> 22 
+      </td>
+      <td> 
+         <p> Utility that access Java functionality to execute any operating system 
+            command specified. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> utlzip.sql 
+      </td>
+      <td> 
+         <p> 22 
+      </td>
+      <td> 
+         <p> Utility that access Java functionality to zip or compress the specified 
+            file. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> xfile.pkg 
+      </td>
+      <td> 
+         <p> 22 
+      </td>
+      <td> 
+         <p> Package that acts as a thing PL/SQL wrapper on top of JFile.java, greatly 
+            improving the range of file I/O functionality available from within PL/SQL 
+            programs 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> build_extprocsh.bat 
+      </td>
+      <td> 
+         <p> 23 
+      </td>
+      <td> 
+         <p> Builds a DLL using Cygwin’s gcc on MS-Windows for the external procedure 
+            &quot;shell&quot; demo. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> build_extprocsh.sh 
+      </td>
+      <td> 
+         <p> 23 
+      </td>
+      <td> 
+         <p> Builds a shared object library using gcc on Unix for the external procedure 
+            &quot;shell&quot; demo. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> extprocsh.c 
+      </td>
+      <td> 
+         <p> 23 
+      </td>
+      <td> 
+         <p> Final version of C program that implements the extprocsh external procedure 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> extprocsh.sql 
+      </td>
+      <td> 
+         <p> 23 
+      </td>
+      <td> 
+         <p> PL/SQL call spec for extprocsh external procedure. 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> summer_reading.pkg 
+      </td>
+      <td> 
+         <p> 11, 19 
+      </td>
+      <td> 
+         <p> Example of use of associative arrays to cache data from a database table 
+            and access it very efficiently 
+      </td>
+   </tr>
+   <tr> 
+      <td> 
+         <p> sf_timer.pks/pkb 
+      </td>
+      <td> 
+         <p> 16, 19 
+      </td>
+      <td> 
+         <p> Utility to calculate elapsed time of execution. 
+      </td>
+   </tr>
+</table>
+</body>
+</html>

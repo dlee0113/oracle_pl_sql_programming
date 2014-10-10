@@ -1,0 +1,110 @@
+CREATE OR REPLACE PACKAGE multdim
+-- Created by John Beresniewicz
+IS
+   TYPE dim1_t IS TABLE OF VARCHAR2 (32767)
+      INDEX BY PLS_INTEGER;
+
+   TYPE dim2_t IS TABLE OF dim1_t
+      INDEX BY PLS_INTEGER;
+
+   TYPE dim3_t IS TABLE OF dim2_t
+      INDEX BY PLS_INTEGER;
+
+   PROCEDURE setcell (
+      array_in   IN OUT   dim3_t
+     ,dim1_in             PLS_INTEGER
+     ,dim2_in             PLS_INTEGER
+     ,dim3_in             PLS_INTEGER
+     ,value_in   IN       VARCHAR2
+   );
+
+   FUNCTION getcell (
+      array_in   IN   dim3_t
+     ,dim1_in         PLS_INTEGER
+     ,dim2_in         PLS_INTEGER
+     ,dim3_in         PLS_INTEGER
+   )
+      RETURN VARCHAR2;
+
+   FUNCTION EXISTS (
+      array_in   IN   dim3_t
+     ,dim1_in         PLS_INTEGER
+     ,dim2_in         PLS_INTEGER
+     ,dim3_in         PLS_INTEGER
+   )
+      RETURN BOOLEAN;
+END multdim;
+/
+
+CREATE OR REPLACE PACKAGE BODY multdim
+IS
+   PROCEDURE setcell (
+      array_in   IN OUT   dim3_t
+     ,dim1_in             PLS_INTEGER
+     ,dim2_in             PLS_INTEGER
+     ,dim3_in             PLS_INTEGER
+     ,value_in   IN       VARCHAR2
+   )
+   IS
+   BEGIN
+      array_in (dim3_in) (dim2_in) (dim1_in) := value_in;
+   END;
+
+   FUNCTION getcell (
+      array_in   IN   dim3_t
+     ,dim1_in         PLS_INTEGER
+     ,dim2_in         PLS_INTEGER
+     ,dim3_in         PLS_INTEGER
+   )
+      RETURN VARCHAR2
+   IS
+   BEGIN
+      RETURN array_in (dim3_in) (dim2_in) (dim1_in);
+   END;
+
+   FUNCTION EXISTS (
+      array_in   IN   dim3_t
+     ,dim1_in         PLS_INTEGER
+     ,dim2_in         PLS_INTEGER
+     ,dim3_in         PLS_INTEGER
+   )
+      RETURN BOOLEAN
+   IS
+      l_value   VARCHAR2 (32767);
+   BEGIN
+       -- 11/2002 Manchester
+       -- The value doesn't matter; what matters is whether
+       -- this combination exists or not.
+      --
+      -- 02/2003 NWOUG Seattle
+      -- Note: EXISTS method only applies to a single
+      --       collection at a time.
+
+      /*
+      IF array_in(dim3_in )(dim2_in )(dim1_in) IS NOT NULL
+       THEN
+         RETURN TRUE;
+       ELSE
+         RETURN TRUE;
+       END IF;
+       */
+
+      -- Disney World approach 4/2003
+      l_value := array_in (dim3_in) (dim2_in) (dim1_in);
+      RETURN TRUE;
+   EXCEPTION
+      WHEN NO_DATA_FOUND
+      THEN
+         RETURN FALSE;
+   END;
+END multdim;
+/
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/

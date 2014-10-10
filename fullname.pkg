@@ -1,0 +1,101 @@
+CREATE OR REPLACE PACKAGE employee_pkg
+AS 
+   SUBTYPE fullname_t IS VARCHAR2 (200);
+
+   FUNCTION fullname (
+      last_in           employees.last_name%TYPE,
+      first_in          employees.first_name%TYPE,
+      use_f_l_in   IN   BOOLEAN := FALSE
+   )
+      RETURN fullname_t;
+
+   FUNCTION fullname (
+      last_in           employees.last_name%TYPE,
+      first_in          employees.first_name%TYPE,
+      use_f_l_in   IN   PLS_INTEGER := 0
+   )
+      RETURN fullname_t;
+
+   FUNCTION fullname (
+      employee_id_in   IN   employees.employee_id%TYPE,
+      use_f_l_in       IN   BOOLEAN := FALSE
+   )
+      RETURN fullname_t;
+END;
+/
+
+CREATE OR REPLACE PACKAGE BODY employee_pkg
+AS 
+   FUNCTION fullname (
+      last_in           employees.last_name%TYPE,
+      first_in          employees.first_name%TYPE,
+      use_f_l_in   IN   BOOLEAN := FALSE
+   )
+      RETURN fullname_t
+   IS
+   BEGIN
+      IF use_f_l_in
+      THEN
+         RETURN first_in || ' ' || last_in;
+      ELSE
+         RETURN last_in || ',' || first_in;
+      END IF;
+   END;
+
+   FUNCTION fullname (
+      last_in           employees.last_name%TYPE,
+      first_in          employees.first_name%TYPE,
+      use_f_l_in   IN   PLS_INTEGER := 0
+   )
+      RETURN fullname_t
+   IS
+   BEGIN
+      IF use_f_l_in = 1
+      THEN
+         RETURN fullname (last_in, first_in, TRUE );
+      ELSE
+         RETURN fullname (last_in, first_in, FALSE );
+      END IF;
+   END;
+
+   FUNCTION fullname (
+      employee_id_in   IN   employees.employee_id%TYPE,
+      use_f_l_in       IN   BOOLEAN := FALSE
+   )
+      RETURN fullname_t
+   IS 
+      retval   fullname_t;
+      v_tf     PLS_INTEGER := 0;
+   BEGIN
+      IF use_f_l_in
+      THEN
+         v_tf := 1;
+      END IF;
+
+      SELECT fullname (last_name, first_name, v_tf)
+        INTO retval
+        FROM employees
+       WHERE employee_id = employee_id_in;
+
+      RETURN retval;
+   EXCEPTION
+      WHEN NO_DATA_FOUND
+      THEN
+         RETURN NULL;
+      WHEN TOO_MANY_ROWS
+      THEN
+         RAISE; -- errpkg.record_and_stop;
+   END;
+END;
+/
+
+
+
+
+
+/*======================================================================
+| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
+| To submit corrections or find more code samples visit
+| http://oreilly.com/catalog/9780596514464/
+*/
