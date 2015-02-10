@@ -45,13 +45,12 @@ CREATE OR REPLACE PROCEDURE display_multiple_years (
 )
 IS
 BEGIN
-   FOR l_current_year IN (SELECT *
-                            FROM sales_data
-                           WHERE year BETWEEN start_year_in AND end_year_in)
+   FOR sales_rec IN (
+      SELECT *
+        FROM sales_data
+       WHERE year BETWEEN start_year_in AND end_year_in)
    LOOP
-      -- This procedure is now accepted a record implicitly declared
-      -- to be of type sales_data%ROWTYPE...
-      display_total_sales (l_current_year.year);
+      display_total_sales (sales_rec.year);
    END LOOP;
 END display_multiple_years;
 /
@@ -70,12 +69,3 @@ BEGIN
    END LOOP;
 END display_multiple_years;
 /
-
-
-
-/*======================================================================
-| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
-| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
-| To submit corrections or find more code samples visit
-| http://oreilly.com/catalog/9780596514464/
-*/

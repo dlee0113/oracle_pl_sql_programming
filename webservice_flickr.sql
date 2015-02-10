@@ -458,13 +458,3 @@ PROMPT
 PROMPT PHOTO UPLOADED! You should now be able to see the photo at www.flickr.com (login as before)
 PROMPT NB: Please delete the photo when you have viewed it, for the benefit of other users - thanks!
 PROMPT
-
-
-
-/*======================================================================
-| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
-| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
-| To submit corrections or find more code samples visit
-| http://oreilly.com/catalog/9780596514464/
-*/
-

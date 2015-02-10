@@ -1,0 +1,33 @@
+CREATE OR REPLACE PACKAGE plscope_demo
+IS
+   g_public_global   DATE;
+
+   PROCEDURE my_procedure (param1_in   IN INTEGER
+                         , param2      IN employees.last_name%TYPE);
+END plscope_demo;
+/
+
+CREATE OR REPLACE PACKAGE BODY plscope_demo
+IS
+   g_private_global   NUMBER;
+
+   PROCEDURE my_procedure (param1_in   IN INTEGER
+                         , param2      IN employees.last_name%TYPE)
+   IS
+      c_no_such   CONSTANT NUMBER := 100;
+      l_local_variable     NUMBER;
+      l_collection         DBMS_SQL.varchar2a;
+   BEGIN
+      IF param1_in > l_local_variable
+      THEN
+         DECLARE
+            l_nested_var   DATE;
+         BEGIN
+            DBMS_OUTPUT.put_line (param2);
+         END;
+      ELSE
+         DBMS_OUTPUT.put_line (c_no_such);
+      END IF;
+   END my_procedure;
+END plscope_demo;
+/

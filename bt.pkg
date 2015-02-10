@@ -3,6 +3,14 @@ IS
 /*
 | Overview: bt provides structured access to the information
 |           returned by DBMS_UTILITY.format_error_backtrace.
+|
+| Author: Steven Feuerstein
+| Repository: www.qnxo.com
+| Contact: steven@stevenfeuerstein.com
+| Copyright 2004 Steven Feuerstein, all rights reserved
+|
+| You are welcome to copy and use this program, but please
+| include attribution of the source of the code.
 */
    TYPE error_rt IS RECORD (
       program_owner   all_objects.owner%TYPE
@@ -86,12 +94,3 @@ IS
    END show_info;
 END bt;
 /
-
-
-
-/*======================================================================
-| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
-| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
-| To submit corrections or find more code samples visit
-| http://oreilly.com/catalog/9780596514464/
-*/

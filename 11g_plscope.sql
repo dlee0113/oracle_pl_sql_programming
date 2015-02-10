@@ -163,12 +163,3 @@ SELECT called.object_name
        AND called.signature = declared.signature
        AND called.object_name <> 'MY_PACKAGE'
 /
-
-
-
-/*======================================================================
-| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
-| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
-| To submit corrections or find more code samples visit
-| http://oreilly.com/catalog/9780596514464/
-*/

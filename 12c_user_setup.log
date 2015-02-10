@@ -1,0 +1,108 @@
+Connected.
+CREATE TABLE departments
+             *
+ERROR at line 1:
+ORA-00955: name is already used by an existing object 
+
+
+
+PL/SQL procedure successfully completed.
+
+CREATE TABLE employees
+             *
+ERROR at line 1:
+ORA-00955: name is already used by an existing object 
+
+
+
+PL/SQL procedure successfully completed.
+
+
+Procedure created.
+
+
+Grant succeeded.
+
+Connected.
+  FROM employees
+       *
+ERROR at line 2:
+ORA-00942: table or view does not exist 
+
+
+
+PL/SQL procedure successfully completed.
+
+  FROM employees
+       *
+ERROR at line 2:
+ORA-00942: table or view does not exist 
+
+
+
+Rollback complete.
+
+Connected.
+
+Procedure created.
+
+
+Grant succeeded.
+
+Connected.
+  FROM employees
+       *
+ERROR at line 2:
+ORA-00942: table or view does not exist 
+
+
+BEGIN
+*
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+ORA-06512: at "C##HR.REMOVE_EMPS_IN_DEPT", line 7 
+ORA-06512: at line 2 
+
+
+Connected.
+CREATE ROLE c##hr_departments
+            *
+ERROR at line 1:
+ORA-01921: role name 'C##HR_DEPARTMENTS' conflicts with another user or role 
+name 
+
+
+
+Grant succeeded.
+
+Connected.
+
+Grant succeeded.
+
+
+Grant succeeded.
+
+Connected.
+  FROM employees
+       *
+ERROR at line 2:
+ORA-00942: table or view does not exist 
+
+
+BEGIN
+*
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+ORA-06512: at "C##HR.REMOVE_EMPS_IN_DEPT", line 7 
+ORA-06512: at line 2 
+
+
+  FROM employees
+       *
+ERROR at line 2:
+ORA-00942: table or view does not exist 
+
+
+
+Rollback complete.
+
