@@ -1,0 +1,99 @@
+CREATE OR REPLACE PACKAGE dynalloc AUTHID CURRENT_USER
+IS
+   /* Portland OREGON 7/99 NWOUG */
+   PROCEDURE closecur (cur_inout IN OUT INTEGER);
+
+   PROCEDURE initcur (cur_inout IN OUT INTEGER);
+
+   PROCEDURE open_and_parse
+      (cur_inout IN OUT INTEGER,
+       sql_statement_in IN VARCHAR2, 
+       dbms_mode_in IN INTEGER := NULL);
+
+   FUNCTION open_and_parse
+      (sql_statement_in IN VARCHAR2, 
+       dbms_mode_in IN INTEGER := NULL) 
+   RETURN INTEGER;
+
+END dynalloc;
+/
+CREATE OR REPLACE PACKAGE BODY dynalloc
+IS
+   PROCEDURE closecur (cur_inout IN OUT INTEGER) IS
+   BEGIN
+      IF DBMS_SQL.IS_OPEN (cur_inout)
+      THEN
+         DBMS_SQL.CLOSE_CURSOR (cur_inout);
+      END IF;
+   END;
+
+   PROCEDURE initcur (cur_inout IN OUT INTEGER) IS
+   BEGIN
+      IF NOT DBMS_SQL.IS_OPEN (cur_inout)
+      THEN
+         cur_inout := DBMS_SQL.OPEN_CURSOR;
+      END IF;
+   EXCEPTION
+      WHEN invalid_cursor
+      THEN
+         cur_inout := DBMS_SQL.OPEN_CURSOR;
+   END;
+
+   PROCEDURE open_and_parse
+      (cur_inout IN OUT INTEGER,
+       sql_statement_in IN VARCHAR2, 
+       dbms_mode_in IN INTEGER := NULL) 
+      
+   IS
+      v_already_open BOOLEAN :=
+          DBMS_SQL.IS_OPEN (cur_inout);
+   BEGIN
+      initcur (cur_inout);
+
+      DBMS_SQL.PARSE (
+         cur_inout, 
+         sql_statement_in, 
+         NVL (dbms_mode_in, DBMS_SQL.NATIVE)
+         );
+    EXCEPTION
+       WHEN OTHERS
+   	   THEN
+          DBMS_OUTPUT.PUT_LINE (SQLERRM);
+          DBMS_OUTPUT.PUT_LINE (sql_statement_in);
+          IF NOT v_already_open 
+          THEN
+             closecur (cur_inout);   
+          END IF;
+		  RAISE; 
+   END;
+
+   FUNCTION open_and_parse
+      (sql_statement_in IN VARCHAR2, 
+       dbms_mode_in IN INTEGER := NULL) 
+   RETURN INTEGER
+   IS
+      /* Declare cursor handle and assign it a pointer */
+      return_value PLS_INTEGER;
+   BEGIN
+      open_and_parse 
+         (return_value, sql_statement_in, dbms_mode_in);
+      RETURN return_value;
+   END;
+
+END dynalloc;
+/
+
+declare n PLS_INTEGER; 
+begin     
+   dynalloc.open_and_parse (n, 'select * from employee'); 
+   dbms_output.put_line (n);
+   dynalloc.open_and_parse (n, 'select * from emp'); 
+   dbms_output.put_line (n);
+
+   n := dynalloc.open_and_parse ('select * from dept');
+   dbms_output.put_line (n);
+   n := dynalloc.open_and_parse ('select * from department');
+   dbms_output.put_line (n);
+end;
+/
+

@@ -62,11 +62,7 @@ BEGIN
       LOOP
          DBMS_OUTPUT.put_line (desctab (indx).col_name || ' = ');
 
-         IF (desctab (indx).col_type = 1)
-         THEN
-            DBMS_SQL.COLUMN_VALUE (curid, indx, namevar);
-            DBMS_OUTPUT.put_line ('   ' || namevar);
-         ELSIF (desctab (indx).col_type = 2)
+         IF (desctab (indx).col_type = 2)
          THEN
             DBMS_SQL.COLUMN_VALUE (curid, indx, numvar);
             DBMS_OUTPUT.put_line ('   ' || numvar);
@@ -74,6 +70,10 @@ BEGIN
          THEN
             DBMS_SQL.COLUMN_VALUE (curid, indx, datevar);
             DBMS_OUTPUT.put_line ('   ' || datevar);
+         ELSE /* Assume a string - of course, you cannot REALLY do that. */
+         THEN
+            DBMS_SQL.COLUMN_VALUE (curid, indx, namevar);
+            DBMS_OUTPUT.put_line ('   ' || namevar);
          END IF;
       END LOOP;
    END LOOP;
@@ -88,12 +88,3 @@ BEGIN
              );
 END;
 /
-
-
-
-/*======================================================================
-| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
-| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
-| To submit corrections or find more code samples visit
-| http://oreilly.com/catalog/9780596514464/
-*/

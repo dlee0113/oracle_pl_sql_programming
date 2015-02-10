@@ -1,0 +1,150 @@
+Connected.
+CREATE USER c##hr IDENTIFIED BY pwd
+            *
+ERROR at line 1:
+ORA-01920: user name 'C##HR' conflicts with another user or role name 
+
+
+
+Grant succeeded.
+
+
+Grant succeeded.
+
+
+Grant succeeded.
+
+
+Grant succeeded.
+
+CREATE USER c##scott IDENTIFIED BY pwd
+            *
+ERROR at line 1:
+ORA-01920: user name 'C##SCOTT' conflicts with another user or role name 
+
+
+
+Grant succeeded.
+
+
+Grant succeeded.
+
+
+Grant succeeded.
+
+
+Grant succeeded.
+
+Connected.
+
+Table dropped.
+
+
+Table dropped.
+
+
+Table created.
+
+
+PL/SQL procedure successfully completed.
+
+
+Table created.
+
+
+PL/SQL procedure successfully completed.
+
+Connected.
+
+Table dropped.
+
+
+Table created.
+
+
+PL/SQL procedure successfully completed.
+
+Connected.
+
+Procedure created.
+
+
+Grant succeeded.
+
+Connected.
+
+  COUNT(*)                                                                      
+----------                                                                      
+         3                                                                      
+
+Staff freeze in 20? N                                                           
+Rows deleted=3                                                                  
+
+PL/SQL procedure successfully completed.
+
+
+  COUNT(*)                                                                      
+----------                                                                      
+         3                                                                      
+
+
+Rollback complete.
+
+Connected.
+
+Procedure created.
+
+
+Grant succeeded.
+
+Connected.
+
+  COUNT(*)                                                                      
+----------                                                                      
+         3                                                                      
+
+BEGIN
+*
+ERROR at line 1:
+ORA-00942: table or view does not exist 
+ORA-06512: at "C##HR.REMOVE_EMPS_IN_DEPT", line 7 
+ORA-06512: at line 2 
+
+
+Connected.
+CREATE ROLE c##hr_departments
+            *
+ERROR at line 1:
+ORA-01921: role name 'C##HR_DEPARTMENTS' conflicts with another user or role 
+name 
+
+
+
+Grant succeeded.
+
+Connected.
+
+Grant succeeded.
+
+
+Grant succeeded.
+
+Connected.
+
+  COUNT(*)                                                                      
+----------                                                                      
+         3                                                                      
+
+Staff freeze in 20? N                                                           
+Rows deleted=3                                                                  
+
+PL/SQL procedure successfully completed.
+
+
+  COUNT(*)                                                                      
+----------                                                                      
+         0                                                                      
+
+
+Rollback complete.
+

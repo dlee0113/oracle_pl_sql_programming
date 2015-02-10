@@ -32,14 +32,11 @@ END;
 
 BEGIN
    DBMS_OUTPUT.put_line (
-      'Aren''t you glad you''re learning PL/SQL with O''Reilly?'
-   );
+      'Aren''t you glad you''re learning PL/SQL with O''Reilly?');
    DBMS_OUTPUT.put_line (
-      q'!Aren't you glad you're learning PL/SQL with O'Reilly?!'
-   );
+      q'!Aren't you glad you're learning PL/SQL with O'Reilly?!');
    DBMS_OUTPUT.put_line (
-      q'{Aren't you glad you're learning PL/SQL with O'Reilly?}'
-   );
+      q'{Aren't you glad you're learning PL/SQL with O'Reilly?}');
    DBMS_OUTPUT.put_line (n'Pils vom faﬂ: 1Ä');
    DBMS_OUTPUT.put_line (u' Pils vom fa\00DF: 1\20AC');
 END;
@@ -62,13 +59,26 @@ DROP TABLE company
 
 CREATE TABLE company
 (
-   name       VARCHAR2 (100)
- , address1   VARCHAR2 (100)
- , address2   VARCHAR2 (100)
- , city       VARCHAR2 (100)
- , state      VARCHAR2 (100)
- , zipcode    VARCHAR2 (100)
+   name       VARCHAR2 (100),
+   address1   VARCHAR2 (100),
+   address2   VARCHAR2 (100),
+   city       VARCHAR2 (100),
+   state      VARCHAR2 (100),
+   zipcode    VARCHAR2 (100)
 )
+/
+
+BEGIN
+   INSERT INTO company
+        VALUES ('Harold Henderson',
+                '22 BUNKER COURT',
+                NULL,
+                'WYANDANCH',
+                'MN',
+                '66557');
+
+   COMMIT;
+END;
 /
 
 SELECT    name
@@ -126,8 +136,7 @@ BEGIN
 END;
 /
 
-SELECT LEAST ('JONATHON', 'Jonathon', 'jon')
-  FROM DUAL
+SELECT LEAST ('JONATHON', 'Jonathon', 'jon') FROM DUAL
 /
 
 ALTER SESSION SET nls_comp=linguistic
@@ -135,8 +144,7 @@ ALTER SESSION SET nls_comp=linguistic
 ALTER SESSION SET nls_sort=binary_ci
 /
 
-SELECT LEAST ('JONATHON', 'Jonathon', 'jon')
-  FROM DUAL
+SELECT LEAST ('JONATHON', 'Jonathon', 'jon') FROM DUAL
 /
 
 BEGIN
@@ -192,10 +200,10 @@ BEGIN
    LOOP
       comma_location := INSTR (names_adjusted, ',', comma_location + 1);
       EXIT WHEN comma_location = 0;
-      DBMS_OUTPUT.put_line(SUBSTR (names_adjusted
-                                 , prev_location + 1
-                                 , comma_location - prev_location - 1
-                                  ));
+      DBMS_OUTPUT.put_line (
+         SUBSTR (names_adjusted,
+                 prev_location + 1,
+                 comma_location - prev_location - 1));
       prev_location := comma_location;
    END LOOP;
 END;
@@ -240,8 +248,7 @@ DECLARE
 BEGIN
    DBMS_OUTPUT.put_line (RTRIM (a, '.'));
    DBMS_OUTPUT.put_line (
-      LTRIM (b, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz')
-   );
+      LTRIM (b, 'ABCDEFGHIJKLMNOPQRSTUVWXYZ abcdefghijklmnopqrstuvwxyz'));
 END;
 /
 
@@ -269,10 +276,11 @@ BEGIN
    comma_delimited := REGEXP_LIKE (names, '^([a-z A-Z]*,)+([a-z A-Z]*){1}$');
 
    --Display the result
-   DBMS_OUTPUT.put_line(CASE comma_delimited
-                           WHEN TRUE THEN 'We have a delimited list!'
-                           ELSE 'The pattern does not match.'
-                        END);
+   DBMS_OUTPUT.put_line (
+      CASE comma_delimited
+         WHEN TRUE THEN 'We have a delimited list!'
+         ELSE 'The pattern does not match.'
+      END);
 END;
 /
 
@@ -295,17 +303,20 @@ END;
 /
 
 DECLARE
-   contact_info   VARCHAR2 (200) := '
+   contact_info    VARCHAR2 (200) := '
     address:
     1060 W. Addison St.
     Chicago, IL 60613
     home 773-555-5253
   ';
-   phone_pattern VARCHAR2 (90)
-         := '\(?\d{3}\)?[[:space:]\.\-]?\d{3}[[:space:]\.\-]?\d{4}';
+   phone_pattern   VARCHAR2 (90)
+      := '\(?\d{3}\)?[[:space:]\.\-]?\d{3}[[:space:]\.\-]?\d{4}';
 BEGIN
-   DBMS_OUTPUT.put_line('The phone number is: '
-                        || REGEXP_SUBSTR (contact_info, phone_pattern, 1, 1));
+   DBMS_OUTPUT.put_line (   'The phone number is: '
+                         || REGEXP_SUBSTR (contact_info,
+                                           phone_pattern,
+                                           1,
+                                           1));
 END;
 /
 
@@ -318,8 +329,8 @@ DECLARE
         work (312) 555-1234
         cell 224.555.2233
         ';
-   phone_pattern VARCHAR2 (90)
-         := '\(?(\d{3})\)?[[:space:]\.\-]?\d{3}[[:space:]\.\-]?\d{4}';
+   phone_pattern        VARCHAR2 (90)
+      := '\(?(\d{3})\)?[[:space:]\.\-]?\d{3}[[:space:]\.\-]?\d{4}';
    contains_phone_nbr   BOOLEAN;
    phone_number         VARCHAR2 (15);
    phone_counter        NUMBER;
@@ -334,7 +345,10 @@ BEGIN
 
       LOOP
          phone_number :=
-            REGEXP_SUBSTR (contact_info, phone_pattern, 1, phone_counter);
+            REGEXP_SUBSTR (contact_info,
+                           phone_pattern,
+                           1,
+                           phone_counter);
          EXIT WHEN phone_number IS NULL;         -- NULL means no more matches
          DBMS_OUTPUT.put_line (phone_number);
          phone_counter := phone_counter + 1;
@@ -345,13 +359,12 @@ BEGIN
 
       LOOP
          area_code :=
-            REGEXP_SUBSTR (contact_info
-                         , phone_pattern
-                         , 1
-                         , phone_counter
-                         , 'i'
-                         , 1
-                          );
+            REGEXP_SUBSTR (contact_info,
+                           phone_pattern,
+                           1,
+                           phone_counter,
+                           'i',
+                           1);
          EXIT WHEN area_code IS NULL;
          DBMS_OUTPUT.put_line (area_code);
          phone_counter := phone_counter + 1;
@@ -361,18 +374,19 @@ END;
 /
 
 DECLARE
-   contact_info   VARCHAR2 (200) := '
+   contact_info    VARCHAR2 (200) := '
         address:
         1060 W. Addison St.
         Chicago, IL 60613
         home 773-555-5253
         work (312) 123-4567';
-   phone_pattern VARCHAR2 (90)
-         := '\(?(\d{3})\)?[[:space:]\.\-]?(\d{3})[[:space:]\.\-]?\d{4}';
+   phone_pattern   VARCHAR2 (90)
+      := '\(?(\d{3})\)?[[:space:]\.\-]?(\d{3})[[:space:]\.\-]?\d{4}';
 BEGIN
-   DBMS_OUTPUT.put_line(   'There are '
-                        || REGEXP_COUNT (contact_info, phone_pattern)
-                        || ' phone numbers');
+   DBMS_OUTPUT.put_line (
+         'There are '
+      || REGEXP_COUNT (contact_info, phone_pattern)
+      || ' phone numbers');
 END;
 /
 
@@ -390,10 +404,9 @@ BEGIN
    IF comma_delimited
    THEN
       names :=
-         REGEXP_REPLACE (names
-                       , '([a-z A-Z]*),([a-z A-Z]*),'
-                       , '\1,\2' || CHR (10)
-                        );
+         REGEXP_REPLACE (names,
+                         '([a-z A-Z]*),([a-z A-Z]*),',
+                         '\1,\2' || CHR (10));
    END IF;
 
    DBMS_OUTPUT.put_line (names);
@@ -414,10 +427,9 @@ BEGIN
    IF comma_delimited
    THEN
       names :=
-         REGEXP_REPLACE (names
-                       , '([a-z A-Z]*),([a-z A-Z]*),'
-                       , '\1,\2' || CHR (10)
-                        );
+         REGEXP_REPLACE (names,
+                         '([a-z A-Z]*),([a-z A-Z]*),',
+                         '\1,\2' || CHR (10));
    END IF;
 
    DBMS_OUTPUT.put_line (names);
@@ -434,7 +446,11 @@ END;
 DROP TABLE company
 /
 
-CREATE TABLE company (company_id INTEGER, company_name VARCHAR2 (100))
+CREATE TABLE company
+(
+   company_id     INTEGER,
+   company_name   VARCHAR2 (100)
+)
 /
 
 CREATE SEQUENCE company_id_seq
@@ -444,14 +460,10 @@ DECLARE
    comp_id#    NUMBER;
    comp_name   CHAR (20) := 'ACME SHOWERS';
 BEGIN
-   SELECT company_id_seq.NEXTVAL
-     INTO comp_id#
-     FROM DUAL;
+   SELECT company_id_seq.NEXTVAL INTO comp_id# FROM DUAL;
 
-   INSERT INTO company (company_id, company_name
-                       )
-       VALUES (comp_id#, comp_name
-              );
+   INSERT INTO company (company_id, company_name)
+        VALUES (comp_id#, comp_name);
 END;
 /
 
@@ -477,12 +489,3 @@ BEGIN
    END IF;
 END;
 /
-
-
-
-/*======================================================================
-| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
-| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
-| To submit corrections or find more code samples visit
-| http://oreilly.com/catalog/9780596514464/
-*/

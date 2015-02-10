@@ -33,16 +33,7 @@ begin
          l_mod,
          UTL_I18N.STRING_TO_RAW (l_key, 'AL32UTF8')
       );
-   dbms_output.put_line
-      ('Decrypted='||utl_i18n.raw_to_char(l_dec));
+   dbms_output.put_line 
+        ('Decrypted='||utl_i18n.raw_to_char(l_dec));
 end;
 /
-
-
-
-/*======================================================================
-| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
-| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
-| To submit corrections or find more code samples visit
-| http://oreilly.com/catalog/9780596514464/
-*/

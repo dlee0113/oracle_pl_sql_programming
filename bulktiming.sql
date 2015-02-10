@@ -112,12 +112,12 @@ Input truncated to 4 characters
 .Single row fetch 10000 Elapsed: .59 seconds.
 .BULK COLLECT 10000 Elapsed: .16 seconds.
 
-
+*/
 
 
 /*======================================================================
-| Supplement to the fifth edition of Oracle PL/SQL Programming by Steven
-| Feuerstein with Bill Pribyl, Copyright (c) 1997-2009 O'Reilly Media, Inc. 
-| To submit corrections or find more code samples visit
-| http://oreilly.com/catalog/9780596514464/
+| Supplement to the third edition of Oracle PL/SQL Programming by Steven
+| Feuerstein with Bill Pribyl, Copyright (c) 1997-2002 O'Reilly &
+| Associates, Inc. To submit corrections or find more code samples visit
+| http://www.oreilly.com/catalog/oraclep3/
 */
